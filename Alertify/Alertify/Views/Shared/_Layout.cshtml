@@ -24,6 +24,10 @@
                         <li><a asp-controller="User" asp-action="Index" class="nav-link px-2 link-body-emphasis">Usuarios</a></li>
                         <li><a asp-controller="Station" asp-action="Index" class="nav-link px-2 link-body-emphasis">Estaciones</a></li>
                     }
+                    @if (User.IsInRole("Ciudadano"))
+                    {
+                        <li><a asp-controller="Emergencies" asp-action="Index" class="nav-link px-2 link-body-emphasis">Neew Emergency</a></li>
+                    }
                 </ul>
 
                 <div class="dropdown text-end">

@@ -1,0 +1,166 @@
+﻿@model Alertify.Models.Emergency
+@{
+    ViewData["Title"] = "Reportar Emergencia";
+}
+
+<h2 class="mb-4">Registrar Emergencia</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- CATEGORÍA -->
+            <div class="mb-3">
+                <label asp-for="EmergencyCategory" class="form-label">Categoría</label>
+                <select asp-for="EmergencyCategory" class="form-select">
+                    <option value="">Seleccione una categoría</option>
+                    <option>Incendio</option>
+                    <option>Accidente de Tránsito</option>
+                    <option>Robo o Asalto</option>
+                    <option>Violencia Doméstica</option>
+                    <option>Emergencia Médica</option>
+                    <option>Desastre Natural</option>
+                    <option>Corte de Energía</option>
+                    <option>Fuga de Gas</option>
+                    <option>Persona Sospechosa</option>
+                    <option>Otros</option>
+                </select>
+                <span asp-validation-for="EmergencyCategory" class="text-danger"></span>
+            </div>
+
+            <!-- DESCRIPCIÓN -->
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Descripción</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+            </div>
+
+            <!-- DIRECCIÓN -->
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label">Dirección</label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+
+            <!-- REFERENCIA -->
+            <div class="mb-3">
+                <label asp-for="LocationReference" class="form-label">Referencia</label>
+                <input asp-for="LocationReference" class="form-control" />
+            </div>
+
+            <!-- SUBIR IMAGEN -->
+            <div class="mb-3">
+                <label class="form-label">Subir Imagen (opcional)</label>
+                <input type="file" class="form-control" id="imageInput" name="ImageFile" accept="image/*" />
+
+                <!-- Previsualización -->
+                <img id="previewImg" src="#" alt="Vista previa" class="img-fluid mt-2 d-none" style="max-height: 200px;" />
+            </div>
+
+            <!-- LATITUD -->
+            <div class="mb-3">
+                <label asp-for="Latitude" class="form-label">Latitud</label>
+                <input asp-for="Latitude" id="Latitude" class="form-control" readonly />
+            </div>
+
+            <!-- LONGITUD -->
+            <div class="mb-3">
+                <label asp-for="Longitude" class="form-label">Longitud</label>
+                <input asp-for="Longitude" id="Longitude" class="form-control" readonly />
+            </div>
+
+            <!-- PRIORIDAD -->
+            <div class="mb-3">
+                <label asp-for="Priority" class="form-label">Prioridad</label>
+                <select asp-for="Priority" class="form-select">
+                    <option value="">Seleccione prioridad</option>
+                    <option>Baja</option>
+                    <option>Media</option>
+                    <option>Alta</option>
+                    <option>Crítica</option>
+                </select>
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+
+            <!-- BOTÓN OBTENER UBICACIÓN -->
+            <button type="button" class="btn btn-success mb-3" id="btnLocation">Obtener mi ubicación</button>
+
+            <!-- REGISTRAR -->
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+
+        </form>
+    </div>
+
+    <!-- MAPA -->
+    <div class="col-md-6">
+        <h5>Seleccionar ubicación</h5>
+        <div id="map" style="height: 500px;" class="border rounded"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([-17.7833, -63.1821], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        let marker;
+
+        // CLICK EN MAPA
+        map.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+
+            document.getElementById("Latitude").value = lat;
+            document.getElementById("Longitude").value = lng;
+
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lng]).addTo(map);
+        });
+
+        // UBICACIÓN AUTOMÁTICA
+        document.getElementById("btnLocation").addEventListener("click", function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (pos) {
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+
+                    document.getElementById("Latitude").value = lat;
+                    document.getElementById("Longitude").value = lng;
+
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    map.setView([lat, lng], 16);
+                });
+            } else {
+                alert("Geolocalización no disponible");
+            }
+        });
+
+        // PREVIEW DE IMAGEN
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            const img = document.getElementById("previewImg");
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                    img.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
