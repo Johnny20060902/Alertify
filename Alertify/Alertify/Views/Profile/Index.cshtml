@@ -1,0 +1,227 @@
+﻿@model Alertify.Models.User
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Mi Perfil</h2>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePhotoURL))
+                        {
+                            <img src="@Model.ProfilePhotoURL" alt="Foto de perfil"
+                                 class="rounded-circle mb-3"
+                                 style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #dee2e6;">
+                        }
+                        else
+                        {
+                            <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 120px; height: 120px; font-size: 3rem;">
+                                @Model.FirstName.Substring(0, 1).ToUpper()
+                            </div>
+                        }
+
+                        <h4 class="mb-1">@Model.FirstName @Model.FirstLastName @Model.SecondLastName</h4>
+
+                        @if (Model.Role == "Admin")
+                        {
+                            <span class="badge bg-danger"><i class="bi bi-shield-check"></i> Administrador</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary"><i class="bi bi-person"></i> Ciudadano</span>
+                        }
+                    </div>
+
+                    <hr>
+
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label class="text-muted small mb-1"><i class="bi bi-envelope"></i> Correo Electrónico</label>
+                            <div class="fw-semibold">
+                                @Model.Email
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Phone))
+                        {
+                            <div class="col-12">
+                                <label class="text-muted small mb-1"><i class="bi bi-phone"></i> Teléfono</label>
+                                <div class="fw-semibold">
+                                    @Model.Phone
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.NationalID))
+                        {
+                            <div class="col-12">
+                                <label class="text-muted small mb-1"><i class="bi bi-card-text"></i> Cédula de Identidad</label>
+                                <div class="fw-semibold">
+                                    @Model.NationalID
+                                </div>
+                            </div>
+                        }
+
+                        <div class="col-6">
+                            <label class="text-muted small mb-1"><i class="bi bi-calendar-check"></i> Fecha de Registro</label>
+                            <div class="fw-semibold">
+                                @Model.RegistrationDate.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                        @if (Model.LastAccess.HasValue)
+                        {
+                            <div class="col-6">
+                                <label class="text-muted small mb-1"><i class="bi bi-clock-history"></i> Último Acceso</label>
+                                <div class="fw-semibold">
+                                    @Model.LastAccess.Value.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Profile" asp-action="Edit" class="btn btn-primary">
+                            <i class="bi bi-pencil-square"></i> Editar Perfil
+                        </a>
+                        <a asp-controller="Authentication" asp-action="ChangePassword" class="btn btn-outline-warning">
+                            <i class="bi bi-lock"></i> Cambiar Contraseña
+                        </a>
+                        <button type="button" id="btnChangePhoto" class="btn btn-outline-primary">
+                            <i class="bi bi-camera"></i> Cambiar Foto
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display:none">
+
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Click en "Cambiar foto" abre el selector de archivos
+            $('#btnChangePhoto').click(function () {
+                $('#photoInput').click();
+            });
+
+            // Cuando se selecciona un archivo
+            $('#photoInput').change(function () {
+                var file = this.files[0];
+
+                if (!file) return;
+
+                // Validar tipo de archivo
+                var validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Solo se permiten imágenes JPG o PNG');
+                    this.value = '';
+                    return;
+                }
+
+                // Validar tamaño (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('La imagen no debe superar 2MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Crear FormData y enviar
+                var formData = new FormData();
+                formData.append('photo', file);
+
+                $.ajax({
+                    url: '@Url.Action("UploadPhoto", "Profile")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            // Actualizar la imagen
+                            $('#profilePhoto').attr('src', response.newPhotoUrl);
+
+                            // Mostrar botón de eliminar
+                            $('#btnDeletePhoto').show();
+
+                            // Mostrar mensaje de éxito
+                            alert(response.message);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Error al subir la foto. Intente nuevamente.');
+                    }
+                });
+
+                // Limpiar el input
+                this.value = '';
+            });
+
+            // Click en "Eliminar foto"
+            $('#btnDeletePhoto').click(function () {
+                if (!confirm('¿Está seguro que desea eliminar su foto de perfil?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("DeletePhoto", "Profile")',
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            // Volver a la imagen por defecto
+                            $('#profilePhoto').attr('src', 'https://via.placeholder.com/150?text=Sin+Foto');
+
+                            // Ocultar botón de eliminar
+                            $('#btnDeletePhoto').hide();
+
+                            // Mostrar mensaje de éxito
+                            alert(response.message);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Error al eliminar la foto. Intente nuevamente.');
+                    }
+                });
+            });
+
+            // Mostrar/ocultar botón eliminar al cargar la página
+            @if (string.IsNullOrEmpty(Model.ProfilePhotoURL))
+            {
+                        <text>$('#btnDeletePhoto').hide();</text>
+            }
+        });
+    </script>
+}

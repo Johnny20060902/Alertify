@@ -1,0 +1,75 @@
+﻿@model Alertify.ViewModels.Authentication.LoginCredentials
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - Alertify</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+
+    <main class="bg-white p-5 rounded shadow-sm w-100" style="max-width: 420px;">
+        <div class="text-center mb-4">
+            <h1 class="h3 mb-1 fw-normal">Alertify</h1>
+            <p class="text-muted small">Sistema de Gestión de Emergencias</p>
+        </div>
+
+        <form asp-controller="Authentication" asp-action="Login" method="post">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Correo Electrónico</label>
+                <input asp-for="Email" type="email" class="form-control" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Contraseña</label>
+                <input asp-for="Password" type="password" class="form-control" required />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">Recordarme</label>
+                </div>
+                <a asp-controller="Authentication" asp-action="ForgotPassword" class="small text-decoration-none">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar Sesión</button>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="text-center">
+                <a asp-controller="Authentication" asp-action="Register" class="btn btn-outline-secondary w-100">
+                    Crear cuenta nueva
+                </a>
+            </div>
+        </form>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>
