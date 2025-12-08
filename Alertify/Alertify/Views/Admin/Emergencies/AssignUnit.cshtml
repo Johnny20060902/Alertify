@@ -1,0 +1,137 @@
+﻿@model Alertify.Models.Emergency
+@{
+    ViewData["Title"] = "Asignar Unidad";
+    var stations = ViewBag.Stations as List<Alertify.Models.Station>;
+    var units = ViewBag.Units as List<Alertify.Models.Unit>;
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">
+        <i class="bi bi-truck text-primary"></i> Asignar Unidad a la Emergencia
+    </h2>
+
+    <div class="alert alert-info">
+        <strong>Emergencia:</strong> @Model.EmergencyCategory <br />
+        <strong>Descripción:</strong> @Model.Description <br />
+        <strong>Ubicación:</strong> @Model.Address
+    </div>
+
+    <div class="row g-4">
+
+        <!-- MAPA -->
+        <div class="col-lg-6">
+            <h5 class="mb-2">
+                <i class="bi bi-geo-alt-fill text-danger"></i> Estaciones Disponibles
+            </h5>
+
+            <div id="map" style="height: 450px;" class="border rounded shadow-sm"></div>
+        </div>
+
+        <!-- TABLA DE UNIDADES -->
+        <div class="col-lg-6">
+            <h5 class="mb-2">
+                <i class="bi bi-list-task text-primary"></i> Unidades más cercanas
+            </h5>
+
+            <table class="table table-hover shadow-sm rounded">
+                <thead class="table-light">
+                    <tr>
+                        <th>Unidad</th>
+                        <th>Estación</th>
+                        <th>Distancia</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="unitsTable">
+                    @foreach (var u in units)
+                    {
+                        <tr>
+                            <td>@u.Name</td>
+                            <td>@u.Station?.Name</td>
+                            <td>@(u.CalculatedProximity.ToString("0.000") ?? "-") km</td>
+                            <td>
+                                <form asp-action="AssignUnit" method="post">
+                                    <input type="hidden" name="emergencyId" value="@Model.EmergencyID" />
+                                    <input type="hidden" name="unitId" value="@u.UnitID" />
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-check-circle"></i> Asignar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var emergencyLat = @Model.Latitude;
+        var emergencyLng = @Model.Longitude;
+
+        var map = L.map('map').setView([emergencyLat, emergencyLng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
+
+        // marcador de la emergencia
+        L.marker([emergencyLat, emergencyLng], { icon: L.icon({
+            iconUrl: '/img/emergency-pin.png',
+            iconSize: [32, 32],
+        })}).addTo(map)
+            .bindPopup("<b>Ubicación de la Emergencia</b>");
+
+        // estaciones
+        var stations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stations));
+
+        stations.forEach(s => {
+            var marker = L.marker([s.latitude, s.longitude]).addTo(map);
+
+            marker.bindPopup(`
+                <b>${s.name}</b><br>
+                <small>${s.address ?? 'Sin dirección'}</small><br>
+                <span class='badge bg-primary'>${(s.units?.length ?? 0)} unidades</span>
+            `);
+
+            marker.on("click", function () {
+                highlightUnitsForStation(s.stationID);
+            });
+        });
+
+        // filtra unidades según estación clickeada
+        function highlightUnitsForStation(stationId) {
+            fetch(`/Unit/GetUnitsByStation/${stationId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const table = document.getElementById("unitsTable");
+                    table.innerHTML = "";
+
+                    data.forEach(u => {
+                        let row = `
+                            <tr>
+                                <td>${u.name}</td>
+                                <td>${u.stationName}</td>
+                                <td>${u.proximity.toFixed(3)} km</td>
+                                <td>
+                                    <form method='post' action='/Admin/AssignUnit'>
+                                        <input type='hidden' name='emergencyId' value='@Model.EmergencyID' />
+                                        <input type='hidden' name='unitId' value='${u.unitID}' />
+                                        <button class='btn btn-primary btn-sm'>
+                                            Asignar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>`;
+                        table.innerHTML += row;
+                    });
+                });
+        }
+    </script>
+}

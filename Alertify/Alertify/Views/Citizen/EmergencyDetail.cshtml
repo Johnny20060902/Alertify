@@ -1,0 +1,310 @@
+﻿@model Alertify.Models.Emergency
+@{
+    ViewData["Title"] = "Detalle de Emergencia";
+    var assignments = ViewBag.Assignments as List<Alertify.Models.EmergencyAssignment>;
+    var statusHistory = ViewBag.StatusHistory as List<Alertify.Models.EmergencyStatusHistory>;
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container-fluid py-4">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="h4 mb-1">
+                    Emergencia #@Model.EmergencyID
+                </h2>
+                <span class="text-muted small">Detalle de emergencia registrada por el ciudadano</span>
+            </div>
+            <a asp-controller="Citizen" asp-action="MyEmergencies" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h5 class="card-title h6 mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Información general
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Categoría</p>
+                            @{
+                                var categoryIcon = Model.EmergencyCategory switch
+                                {
+                                    "Policia" => "shield-fill-exclamation",
+                                    "Bomberos" => "fire",
+                                    "Medico" => "heart-pulse-fill",
+                                    _ => "exclamation-circle"
+                                };
+                            }
+                            <p class="fw-semibold mb-0">
+                                <i class="bi bi-@categoryIcon me-1"></i>
+                                @Model.EmergencyCategory
+                            </p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Estado actual</p>
+                            @{
+                                var statusClass = Model.EmergencyStatus switch
+                                {
+                                    "Pendiente" => "warning",
+                                    "Asignada" => "info",
+                                    "EnCamino" => "primary",
+                                    "EnSitio" => "success",
+                                    "Resuelta" => "secondary",
+                                    "Cancelada" => "dark",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@statusClass">@Model.EmergencyStatus</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Prioridad</p>
+                            @{
+                                var priorityClass = Model.Priority switch
+                                {
+                                    "Baja" => "secondary",
+                                    "Media" => "warning",
+                                    "Alta" => "primary",
+                                    "Critica" => "danger",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@priorityClass">@Model.Priority</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Fecha de reporte</p>
+                            <p class="mb-0">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                @Model.CreationDate.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                        </div>
+
+                        @if (Model.AssignmentDate.HasValue)
+                        {
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-1">Fecha de asignación</p>
+                                <p class="mb-0">
+                                    <i class="bi bi-clock me-1"></i>
+                                    @Model.AssignmentDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                            </div>
+                        }
+
+                        @if (Model.ResolutionDate.HasValue)
+                        {
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-1">Fecha de resolución</p>
+                                <p class="mb-0">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    @Model.ResolutionDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                            </div>
+                        }
+
+                        <div class="col-12">
+                            <p class="text-muted small mb-1">Descripción</p>
+                            <p class="mb-0">@Model.Description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h5 class="card-title h6 mb-0">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Ubicación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Dirección</p>
+                            <p class="mb-0">@(Model.Address ?? "No especificada")</p>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.LocationReference))
+                        {
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-1">Referencia</p>
+                                <p class="mb-0">@Model.LocationReference</p>
+                            </div>
+                        }
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">Coordenadas</p>
+                            <p class="mb-0">
+                                <small class="text-muted font-monospace">
+                                    Lat: @Model.Latitude, Lng: @Model.Longitude
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="map" class="border rounded" style="height: 320px;"></div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ImageURL))
+            {
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title h6 mb-0">
+                            <i class="bi bi-image me-2"></i>
+                            Imagen adjunta
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="@Model.ImageURL"
+                             alt="Imagen de emergencia"
+                             class="img-fluid rounded"
+                             style="max-height: 380px; object-fit: cover;">
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            @if (assignments != null && assignments.Any())
+            {
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title h6 mb-0">
+                            <i class="bi bi-truck me-2"></i>
+                            Unidades asignadas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var assignment in assignments)
+                        {
+                            var assignmentStatusClass = assignment.AssignmentStatus switch
+                            {
+                                "Asignada" => "info",
+                                "EnProgreso" => "primary",
+                                "Completada" => "success",
+                                "Cancelada" => "secondary",
+                                _ => "secondary"
+                            };
+
+                            <div class="pb-3 mb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="mb-0">@assignment.Unit.Code</h6>
+                                    <span class="badge bg-@assignmentStatusClass">
+                                        @assignment.AssignmentStatus
+                                    </span>
+                                </div>
+                                <p class="mb-1 small">
+                                    <i class="bi bi-building me-1"></i>
+                                    @assignment.Unit.Station.Name
+                                </p>
+                                <p class="mb-1 small text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Asignada: @assignment.AssignmentDate.ToString("dd/MM HH:mm")
+                                </p>
+                                @if (assignment.CalculatedDistance.HasValue)
+                                {
+                                    <p class="mb-1 small text-muted">
+                                        <i class="bi bi-arrow-left-right me-1"></i>
+                                        Distancia: @assignment.CalculatedDistance.Value.ToString("F2") km
+                                    </p>
+                                }
+                                @if (!string.IsNullOrEmpty(assignment.Notes))
+                                {
+                                    <p class="mb-0 small">
+                                        <i class="bi bi-chat-left-text me-1"></i>
+                                        @assignment.Notes
+                                    </p>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (statusHistory != null && statusHistory.Any())
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title h6 mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Historial de estados
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var history in statusHistory)
+                        {
+                            <div class="pb-3 mb-3 border-bottom">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-2">
+                                        <i class="bi bi-arrow-right-circle text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 small">
+                                            @if (!string.IsNullOrEmpty(history.PreviousStatus))
+                                            {
+                                                <span class="badge bg-secondary">@history.PreviousStatus</span>
+                                                <i class="bi bi-arrow-right mx-1"></i>
+                                            }
+                                            <span class="badge bg-primary">@history.NewStatus</span>
+                                        </p>
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="bi bi-calendar3 me-1"></i>
+                                            @history.ChangeDate.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                        @if (!string.IsNullOrEmpty(history.Comment))
+                                        {
+                                            <p class="mb-0 small">
+                                                <i class="bi bi-chat-quote me-1"></i>
+                                                @history.Comment
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const lat = @Model.Latitude;
+        const lng = @Model.Longitude;
+
+        const map = L.map('map').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        const emergencyIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        L.marker([lat, lng], { icon: emergencyIcon })
+            .addTo(map)
+            .bindPopup('<b>Ubicación de la emergencia</b>')
+            .openPopup();
+    </script>
+}

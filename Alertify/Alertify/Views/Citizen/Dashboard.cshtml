@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Mi Dashboard";
+    var activeEmergencies = ViewBag.ActiveEmergencies as List<Alertify.Models.Emergency>;
+    var unreadNotifications = ViewBag.UnreadNotifications as List<Alertify.Models.Notification>;
+    var unreadCount = (int)ViewBag.UnreadCount;
+}
+
+<div class="container-fluid py-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Bienvenido, @User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</h2>
+            <p class="text-muted mb-0">Gestiona tus emergencias y mantente informado</p>
+        </div>
+
+        <a asp-controller="Citizen" asp-action="CreateEmergency" class="btn btn-danger btn-lg">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> Reportar Emergencia
+        </a>
+    </header>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <section class="row g-3 mb-4">
+        <article class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-danger bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-exclamation-circle-fill text-danger fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@(activeEmergencies?.Count ?? 0)</h3>
+                    <small class="text-muted">Emergencias Activas</small>
+                </div>
+            </div>
+        </article>
+        <article class="col-md-4">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-warning bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-bell-fill text-warning fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@unreadCount</h3>
+                    <small class="text-muted">Notificaciones Nuevas</small>
+                </div>
+            </div>
+        </article>
+        <article class="col-md-4">
+            <a asp-controller="Citizen" asp-action="MyEmergencies"
+               class="card border-0 shadow-sm text-center text-decoration-none p-4 h-100">
+                <i class="bi bi-clock-history text-secondary fs-2 mb-2"></i>
+                <span class="text-secondary">Ver Historial Completo</span>
+            </a>
+        </article>
+    </section>
+
+    <div class="row g-4">
+        <section class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+
+                <header class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-activity me-2 text-danger"></i> Emergencias Activas
+                    </h5>
+                </header>
+
+                @if (activeEmergencies?.Any() == true)
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var emergency in activeEmergencies)
+                        {
+                            var statusClass = emergency.EmergencyStatus switch
+                            {
+                                "Pendiente" => "warning",
+                                "Asignada" => "info",
+                                "EnCamino" => "primary",
+                                "EnSitio" => "success",
+                                _ => "secondary"
+                            };
+
+                            var categoryIcon = emergency.EmergencyCategory switch
+                            {
+                                "Policia" => "shield-fill-exclamation",
+                                "Bomberos" => "fire",
+                                "Medico" => "heart-pulse-fill",
+                                _ => "exclamation-circle"
+                            };
+
+                            <li class="list-group-item d-flex justify-content-between align-items-start py-3">
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="bi bi-@categoryIcon text-danger"></i>
+                                        <strong>@emergency.EmergencyCategory</strong>
+                                        <span class="badge bg-@statusClass">@emergency.EmergencyStatus</span>
+                                    </div>
+
+                                    <p class="mb-1 text-muted small">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        @(emergency.Address ?? "Ubicación no especificada")
+                                    </p>
+
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        @emergency.CreationDate.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </div>
+
+                                <a asp-controller="Citizen"
+                                   asp-action="EmergencyDetail"
+                                   asp-route-id="@emergency.EmergencyID"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Ver Detalle
+                                </a>
+
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                        <p class="text-muted mb-0">No tienes emergencias activas en este momento</p>
+                    </div>
+                }
+            </div>
+        </section>
+        <aside class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+
+                <header class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bell me-2 text-warning"></i> Notificaciones
+                    </h5>
+
+                    @if (unreadCount > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@unreadCount</span>
+                    }
+                </header>
+
+                @if (unreadNotifications?.Any() == true)
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var notification in unreadNotifications)
+                        {
+                            <li class="list-group-item d-flex gap-2">
+                                <span class="badge bg-primary rounded-pill mt-1">•</span>
+                                <div>
+                                    <h6 class="mb-1 small fw-bold">@notification.Subject</h6>
+                                    <p class="mb-1 small text-muted">@notification.Message</p>
+                                    <small class="text-muted">@notification.SendDate.ToString("dd/MM HH:mm")</small>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+
+                    <footer class="card-footer bg-white text-center py-2">
+                        <a asp-controller="Citizen" asp-action="Notifications" class="small text-decoration-none">
+                            Ver todas las notificaciones
+                        </a>
+                    </footer>
+                }
+                else
+                {
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-bell-slash text-muted fs-1 mb-3"></i>
+                        <p class="text-muted small mb-0">No tienes notificaciones nuevas</p>
+                    </div>
+                }
+            </div>
+        </aside>
+
+    </div>
+
+</div>

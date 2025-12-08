@@ -1,0 +1,167 @@
+﻿@model IEnumerable<Alertify.Models.Emergency>
+
+@{
+    ViewData["Title"] = "Emergencias Reportadas";
+}
+
+<h2 class="mb-4">Panel de Emergencias</h2>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <form method="get" class="row g-3">
+
+            <div class="col-md-3">
+                <label class="form-label">Categoría</label>
+                <select name="category" class="form-select">
+                    <option value="">Todas</option>
+                    <option>Incendio</option>
+                    <option>Accidente de Tránsito</option>
+                    <option>Robo o Asalto</option>
+                    <option>Violencia Doméstica</option>
+                    <option>Emergencia Médica</option>
+                    <option>Desastre Natural</option>
+                    <option>Corte de Energía</option>
+                    <option>Fuga de Gas</option>
+                    <option>Persona Sospechosa</option>
+                    <option>Otros</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="status" class="form-select">
+                    <option value="">Todos</option>
+                    <option>Pendiente</option>
+                    <option>Asignada</option>
+                    <option>En Curso</option>
+                    <option>Resuelta</option>
+                    <option>Cancelada</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Prioridad</label>
+                <select name="priority" class="form-select">
+                    <option value="">Todas</option>
+                    <option>Baja</option>
+                    <option>Media</option>
+                    <option>Alta</option>
+                    <option>Crítica</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Buscar (Dirección / Descripción)</label>
+                <input name="search" type="text" class="form-control" placeholder="Ej: Avenida Busch">
+            </div>
+
+            <div class="col-12 mt-2 text-end">
+                <button class="btn btn-primary">
+                    <i class="bi bi-filter"></i> Filtrar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Dirección</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        <i class="bi bi-info-circle"></i> No hay emergencias registradas.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    string stateClass = item.EmergencyStatus switch
+                    {
+                        "Pendiente" => "badge bg-danger",
+                        "Asignada" => "badge bg-warning text-dark",
+                        "En Curso" => "badge bg-primary",
+                        "Resuelta" => "badge bg-success",
+                        _ => "badge bg-secondary"
+                    };
+
+                    string priorityClass = item.Priority switch
+                    {
+                        "Crítica" => "badge bg-danger",
+                        "Alta" => "badge bg-warning text-dark",
+                        "Media" => "badge bg-info text-dark",
+                        "Baja" => "badge bg-secondary",
+                        _ => "badge bg-secondary"
+                    };
+
+                    <tr>
+                        <td>@item.EmergencyID</td>
+                        <td>@item.EmergencyCategory</td>
+                        <td>@item.Description</td>
+                        <td>@item.Address</td>
+
+                        <td>
+                            <span class="@priorityClass">@item.Priority</span>
+                        </td>
+
+                        <td>
+                            <span class="@stateClass">@item.EmergencyStatus</span>
+                        </td>
+
+                        <td>@item.CreationDate.ToString("dd/MM/yyyy HH:mm")</td>
+
+                        <td>
+                            <div class="btn-group">
+
+                                <a asp-action="Details" asp-route-id="@item.EmergencyID"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <a asp-action="AssignUnit" asp-route-id="@item.EmergencyID"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Asignar unidad">
+                                    <i class="bi bi-truck"></i>
+                                </a>
+
+                                <a asp-action="UpdateStatus" asp-route-id="@item.EmergencyID"
+                                   class="btn btn-sm btn-outline-success"
+                                   title="Actualizar estado">
+                                    <i class="bi bi-check2-circle"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        console.log("Index emergencias cargado");
+    </script>
+}

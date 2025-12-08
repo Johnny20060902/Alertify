@@ -1,0 +1,143 @@
+﻿@model List<Alertify.Models.Emergency>
+@{
+    ViewData["Title"] = "Mis Emergencias";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Historial de Emergencias
+                    </h4>
+                    <a asp-controller="Citizen" asp-action="Dashboard" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Volver al Dashboard
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th>Descripción</th>
+                                        <th>Ubicación</th>
+                                        <th>Estado</th>
+                                        <th>Prioridad</th>
+                                        <th>Fecha</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var emergency in Model)
+                                    {
+                                        var statusClass = emergency.EmergencyStatus switch
+                                        {
+                                            "Pendiente" => "warning",
+                                            "Asignada" => "info",
+                                            "EnCamino" => "primary",
+                                            "EnSitio" => "success",
+                                            "Resuelta" => "secondary",
+                                            "Cancelada" => "dark",
+                                            _ => "secondary"
+                                        };
+
+                                        var priorityClass = emergency.Priority switch
+                                        {
+                                            "Baja" => "secondary",
+                                            "Media" => "warning",
+                                            "Alta" => "orange",
+                                            "Critica" => "danger",
+                                            _ => "secondary"
+                                        };
+
+                                        var categoryIcon = emergency.EmergencyCategory switch
+                                        {
+                                            "Policia" => "shield-fill-exclamation",
+                                            "Bomberos" => "fire",
+                                            "Medico" => "heart-pulse-fill",
+                                            _ => "exclamation-circle"
+                                        };
+
+                                        <tr>
+                                            <td>
+                                                <i class="bi bi-@categoryIcon text-danger me-1"></i>
+                                                <strong>@emergency.EmergencyCategory</strong>
+                                            </td>
+                                            <td>
+                                                <span class="text-truncate d-inline-block" style="max-width: 250px;"
+                                                      title="@emergency.Description">
+                                                    @emergency.Description
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-geo-alt me-1"></i>
+                                                    @(emergency.Address ?? "No especificada")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@statusClass">
+                                                    @emergency.EmergencyStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@priorityClass">
+                                                    @emergency.Priority
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>@emergency.CreationDate.ToString("dd/MM/yyyy")</small>
+                                                <br>
+                                                <small class="text-muted">@emergency.CreationDate.ToString("HH:mm")</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <a asp-controller="Citizen" asp-action="EmergencyDetail"
+                                                   asp-route-id="@emergency.EmergencyID"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="text-muted mb-0">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Total de emergencias: <strong>@Model.Count</strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <small class="text-muted">
+                                        Activas: <strong>@Model.Count(e => e.EmergencyStatus != "Resuelta" && e.EmergencyStatus != "Cancelada")</strong> |
+                                        Resueltas: <strong>@Model.Count(e => e.EmergencyStatus == "Resuelta")</strong> |
+                                        Canceladas: <strong>@Model.Count(e => e.EmergencyStatus == "Cancelada")</strong>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="mt-3 text-muted">No tienes emergencias registradas</h5>
+                            <p class="text-muted">Cuando reportes una emergencia, aparecerá aquí.</p>
+                            <a asp-controller="Citizen" asp-action="CreateEmergency" class="btn btn-danger mt-3">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>Reportar Primera Emergencia
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
