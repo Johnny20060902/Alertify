@@ -17,17 +17,21 @@
                     <span class="fs-4 fw-bold">Alertify</span>
                 </a>
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ms-lg-3">
-                    <li><a asp-controller="Home" asp-action="Index" class="nav-link px-2 link-body-emphasis">Inicio</a></li>
-                    <li><a asp-controller="Emergency" asp-action="Index" class="nav-link px-2 link-body-emphasis">Emergencias</a></li>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li><a asp-controller="User" asp-action="Index" class="nav-link px-2 link-body-emphasis">Usuarios</a></li>
-                        <li><a asp-controller="Station" asp-action="Index" class="nav-link px-2 link-body-emphasis">Estaciones</a></li>
-                    }
-                    @if (User.IsInRole("Ciudadano"))
-                    {
-                        <li><a asp-controller="Emergencies" asp-action="Index" class="nav-link px-2 link-body-emphasis">Neew Emergency</a></li>
-                    }
+                    <li><a asp-controller="Home" asp-action="Index" class="nav-link px-2 link-body-emphasis">
+                        <i class="bi bi-house"></i> Inicio
+                    </a></li>
+                    <li><a asp-controller="Emergencies" asp-action="Index" class="nav-link px-2 link-body-emphasis">
+                        <i class="bi bi-exclamation-triangle"></i> Emergencias
+                    </a></li>
+                    <li><a asp-controller="Units" asp-action="Index" class="nav-link px-2 link-body-emphasis">
+                        <i class="bi bi-truck"></i> Unidades
+                    </a></li>
+                    <li><a asp-controller="Stations" asp-action="Index" class="nav-link px-2 link-body-emphasis">
+                        <i class="bi bi-building"></i> Estaciones
+                    </a></li>
+                    <li><a asp-controller="User" asp-action="Index" class="nav-link px-2 link-body-emphasis">
+                        <i class="bi bi-people"></i> Usuarios
+                    </a></li>
                 </ul>
 
                 <div class="dropdown text-end">

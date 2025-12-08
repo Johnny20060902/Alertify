@@ -1,0 +1,160 @@
+﻿@model Alertify.Models.Station
+
+@{
+    ViewData["Title"] = "Crear Estación";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Crear Nueva Estación</h3>
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- NOMBRE -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Nombre de la Estación</label>
+                            <input asp-for="Name" class="form-control" placeholder="Ej: Estación Central" required/>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- TIPO DE SERVICIO -->
+                        <div class="mb-3">
+                            <label asp-for="ServiceType" class="form-label">Tipo de Servicio</label>
+                            <select asp-for="ServiceType" class="form-select" required>
+                                <option value="">-- Seleccione tipo --</option>
+                                <option>Bomberos</option>
+                                <option>Policía</option>
+                                <option>Ambulancia</option>
+                                <option>Defensa Civil</option>
+                                <option>Otro</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger small"></span>
+                        </div>
+
+                        <!-- DIRECCIÓN -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Dirección</label>
+                            <input asp-for="Address" class="form-control" placeholder="Calle, número, ciudad..."/>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+
+                        <!-- TELÉFONO -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Teléfono</label>
+                            <input asp-for="Phone" class="form-control" placeholder="Ej: +591 3 1234567"/>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+
+                        <!-- LATITUD -->
+                        <div class="mb-3">
+                            <label asp-for="Latitude" class="form-label">Latitud</label>
+                            <input asp-for="Latitude" id="Latitude" class="form-control" placeholder="Se asignará automáticamente" readonly />
+                            <span asp-validation-for="Latitude" class="text-danger small"></span>
+                        </div>
+
+                        <!-- LONGITUD -->
+                        <div class="mb-3">
+                            <label asp-for="Longitude" class="form-label">Longitud</label>
+                            <input asp-for="Longitude" id="Longitude" class="form-control" placeholder="Se asignará automáticamente" readonly />
+                            <span asp-validation-for="Longitude" class="text-danger small"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Crear Estación
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAPA -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Seleccionar Ubicación en el Mapa</h5>
+                    <p class="text-muted small">Haz clic en el mapa para marcar la ubicación de la estación</p>
+                    <div id="map" style="height: 500px; border-radius: 8px;" class="border"></div>
+                    <p class="text-muted small mt-2">
+                        <i class="bi bi-info-circle"></i> Los valores de Latitud y Longitud se actualizarán al hacer clic en el mapa
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Inicializar mapa con coordenadas de Bolivia (La Paz)
+        var map = L.map('map').setView([-16.5, -68.15], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker;
+
+        // Evento de clic en el mapa
+        map.on('click', function (e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            // Actualizar campos de entrada con máximo 6 decimales, usando punto como separador
+            const latStr = lat.toFixed(6).replace(/,/g, '.');
+            const lngStr = lng.toFixed(6).replace(/,/g, '.');
+            
+            document.getElementById("Latitude").value = latStr;
+            document.getElementById("Longitude").value = lngStr;
+
+            // Eliminar marcador anterior
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Crear nuevo marcador
+            marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(`<b>Ubicación seleccionada</b><br/>Lat: ${latStr}<br/>Lng: ${lngStr}`)
+                .openPopup();
+
+            // Centrar mapa en el marcador
+            map.setView([lat, lng], 16);
+        });
+
+        // Buscar ubicación actual del usuario
+        document.addEventListener('DOMContentLoaded', function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // Centrar mapa en ubicación actual
+                    map.setView([lat, lng], 15);
+
+                    // Crear marcador en ubicación actual
+                    marker = L.marker([lat, lng], { title: 'Mi ubicación actual' }).addTo(map)
+                        .bindPopup('Tu ubicación actual')
+                        .openPopup();
+                }, function () {
+                    // Si el usuario rechaza la geolocalización
+                    console.log('Geolocalización rechazada');
+                });
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

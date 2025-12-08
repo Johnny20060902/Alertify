@@ -1,99 +1,100 @@
 ﻿@model Alertify.Models.Emergency
 @{
-    ViewData["Title"] = "Reportar Emergencia";
+    ViewData["Title"] = "Crear Emergencia";
 }
 
-<h2 class="mb-4">Registrar Emergencia</h2>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="card-title mb-4"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Reportar Nueva Emergencia</h2>
+                    <hr />
+                    
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <!-- CATEGORÍA -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EmergencyCategory" class="form-label fw-bold">Categoría de Emergencia *</label>
+                                <select asp-for="EmergencyCategory" class="form-select" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    <option value="Incendio">Incendio</option>
+                                    <option value="Accidente de Tránsito">Accidente de Tránsito</option>
+                                    <option value="Robo o Asalto">Robo o Asalto</option>
+                                    <option value="Violencia Doméstica">Violencia Doméstica</option>
+                                    <option value="Emergencia Médica">Emergencia Médica</option>
+                                    <option value="Desastre Natural">Desastre Natural</option>
+                                    <option value="Corte de Energía">Corte de Energía</option>
+                                    <option value="Fuga de Gas">Fuga de Gas</option>
+                                    <option value="Persona Sospechosa">Persona Sospechosa</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                                <span asp-validation-for="EmergencyCategory" class="text-danger"></span>
+                            </div>
 
-            <!-- CATEGORÍA -->
-            <div class="mb-3">
-                <label asp-for="EmergencyCategory" class="form-label">Categoría</label>
-                <select asp-for="EmergencyCategory" class="form-select">
-                    <option value="">Seleccione una categoría</option>
-                    <option>Incendio</option>
-                    <option>Accidente de Tránsito</option>
-                    <option>Robo o Asalto</option>
-                    <option>Violencia Doméstica</option>
-                    <option>Emergencia Médica</option>
-                    <option>Desastre Natural</option>
-                    <option>Corte de Energía</option>
-                    <option>Fuga de Gas</option>
-                    <option>Persona Sospechosa</option>
-                    <option>Otros</option>
-                </select>
-                <span asp-validation-for="EmergencyCategory" class="text-danger"></span>
+                            <!-- PRIORIDAD -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Priority" class="form-label fw-bold">Nivel de Prioridad *</label>
+                                <select asp-for="Priority" class="form-select" required>
+                                    <option value="">Seleccione prioridad</option>
+                                    <option value="Baja">Baja</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Crítica">Crítica</option>
+                                </select>
+                                <span asp-validation-for="Priority" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold">Descripción de la Emergencia</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describa con detalle la emergencia..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <!-- DIRECCIÓN -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Address" class="form-label fw-bold">Dirección</label>
+                                <input asp-for="Address" class="form-control" placeholder="Calle, número..." />
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+
+                            <!-- REFERENCIA -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationReference" class="form-label fw-bold">Referencia de Ubicación</label>
+                                <input asp-for="LocationReference" class="form-control" placeholder="Puntos de referencia..." />
+                                <span asp-validation-for="LocationReference" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- LATITUD Y LONGITUD (OCULTOS) -->
+                        <input asp-for="Latitude" id="Latitude" type="hidden" />
+                        <input asp-for="Longitude" id="Longitude" type="hidden" />
+
+                        <!-- SUBIR IMAGEN -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subir Imagen (opcional)</label>
+                            <input type="file" class="form-control" id="imageInput" name="ImageFile" accept="image/*" />
+                            <small class="text-muted">Máximo 5 MB</small>
+                            <img id="previewImg" src="#" alt="Vista previa" class="img-fluid mt-2 d-none" style="max-height: 200px;" />
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-send"></i> Reportar Emergencia
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <!-- DESCRIPCIÓN -->
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label">Descripción</label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-            </div>
-
-            <!-- DIRECCIÓN -->
-            <div class="mb-3">
-                <label asp-for="Address" class="form-label">Dirección</label>
-                <input asp-for="Address" class="form-control" />
-            </div>
-
-            <!-- REFERENCIA -->
-            <div class="mb-3">
-                <label asp-for="LocationReference" class="form-label">Referencia</label>
-                <input asp-for="LocationReference" class="form-control" />
-            </div>
-
-            <!-- SUBIR IMAGEN -->
-            <div class="mb-3">
-                <label class="form-label">Subir Imagen (opcional)</label>
-                <input type="file" class="form-control" id="imageInput" name="ImageFile" accept="image/*" />
-
-                <!-- Previsualización -->
-                <img id="previewImg" src="#" alt="Vista previa" class="img-fluid mt-2 d-none" style="max-height: 200px;" />
-            </div>
-
-            <!-- LATITUD -->
-            <div class="mb-3">
-                <label asp-for="Latitude" class="form-label">Latitud</label>
-                <input asp-for="Latitude" id="Latitude" class="form-control" readonly />
-            </div>
-
-            <!-- LONGITUD -->
-            <div class="mb-3">
-                <label asp-for="Longitude" class="form-label">Longitud</label>
-                <input asp-for="Longitude" id="Longitude" class="form-control" readonly />
-            </div>
-
-            <!-- PRIORIDAD -->
-            <div class="mb-3">
-                <label asp-for="Priority" class="form-label">Prioridad</label>
-                <select asp-for="Priority" class="form-select">
-                    <option value="">Seleccione prioridad</option>
-                    <option>Baja</option>
-                    <option>Media</option>
-                    <option>Alta</option>
-                    <option>Crítica</option>
-                </select>
-                <span asp-validation-for="Priority" class="text-danger"></span>
-            </div>
-
-            <!-- BOTÓN OBTENER UBICACIÓN -->
-            <button type="button" class="btn btn-success mb-3" id="btnLocation">Obtener mi ubicación</button>
-
-            <!-- REGISTRAR -->
-            <button type="submit" class="btn btn-primary w-100">Registrar</button>
-
-        </form>
-    </div>
-
-    <!-- MAPA -->
-    <div class="col-md-6">
-        <h5>Seleccionar ubicación</h5>
-        <div id="map" style="height: 500px;" class="border rounded"></div>
+        </div>
     </div>
 </div>
 

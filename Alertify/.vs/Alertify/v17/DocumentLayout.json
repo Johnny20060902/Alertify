@@ -1,13 +1,28 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\johnn\\OneDrive\\Desktop\\Proyecto Alertify\\Alertify\\",
+  "WorkspaceRootPath": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\johnn\\onedrive\\desktop\\proyecto alertify\\alertify\\alertify\\views\\emergencies\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\asus\\documents\\github\\alertify\\alertify\\alertify\\controllers\\unitscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|solutionrelative:alertify\\controllers\\unitscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\asus\\documents\\github\\alertify\\alertify\\alertify\\controllers\\stationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|solutionrelative:alertify\\controllers\\stationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\asus\\documents\\github\\alertify\\alertify\\alertify\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|solutionrelative:alertify\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\dotnet\\sdk\\9.0.302\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\asus\\documents\\github\\alertify\\alertify\\alertify\\views\\emergencies\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|solutionrelative:alertify\\views\\emergencies\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\johnn\\onedrive\\desktop\\proyecto alertify\\alertify\\alertify\\controllers\\emergenciescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|c:\\users\\asus\\documents\\github\\alertify\\alertify\\alertify\\controllers\\emergenciescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6961484C-219B-4A6C-B61C-C38C9A115E0B}|Alertify\\Alertify.csproj|solutionrelative:alertify\\controllers\\emergenciescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -18,30 +33,93 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "EmergenciesController.cs",
-              "DocumentMoniker": "C:\\Users\\johnn\\OneDrive\\Desktop\\Proyecto Alertify\\Alertify\\Alertify\\Controllers\\EmergenciesController.cs",
-              "RelativeDocumentMoniker": "Alertify\\Controllers\\EmergenciesController.cs",
-              "ToolTip": "C:\\Users\\johnn\\OneDrive\\Desktop\\Proyecto Alertify\\Alertify\\Alertify\\Controllers\\EmergenciesController.cs",
-              "RelativeToolTip": "Alertify\\Controllers\\EmergenciesController.cs",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAswFAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T14:03:25.915Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{873151d0-cf2e-48cc-b4bf-ad0394f6a3c3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "UnitsController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\UnitsController.cs",
+              "RelativeDocumentMoniker": "Alertify\\Controllers\\UnitsController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\UnitsController.cs",
+              "RelativeToolTip": "Alertify\\Controllers\\UnitsController.cs",
+              "ViewState": "AgIAAFIAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T03:25:53.516Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "StationsController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\StationsController.cs",
+              "RelativeDocumentMoniker": "Alertify\\Controllers\\StationsController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\StationsController.cs",
+              "RelativeToolTip": "Alertify\\Controllers\\StationsController.cs",
+              "ViewState": "AgIAALoAAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T03:24:52.135Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\appsettings.json",
+              "RelativeDocumentMoniker": "Alertify\\appsettings.json",
+              "ToolTip": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\appsettings.json",
+              "RelativeToolTip": "Alertify\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-08T03:22:36.198Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Microsoft.PackageDependencyResolution.targets",
+              "DocumentMoniker": "C:\\Program Files\\dotnet\\sdk\\9.0.302\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\..\\Program Files\\dotnet\\sdk\\9.0.302\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
+              "ToolTip": "C:\\Program Files\\dotnet\\sdk\\9.0.302\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\..\\Program Files\\dotnet\\sdk\\9.0.302\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
+              "ViewState": "AgIAAKcAAAAAAAAAAAAuwAkBAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-12-08T03:22:10.056Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "EmergenciesController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\EmergenciesController.cs",
+              "RelativeDocumentMoniker": "Alertify\\Controllers\\EmergenciesController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Controllers\\EmergenciesController.cs",
+              "RelativeToolTip": "Alertify\\Controllers\\EmergenciesController.cs",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAswFAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T14:03:25.915Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Create.cshtml",
-              "DocumentMoniker": "C:\\Users\\johnn\\OneDrive\\Desktop\\Proyecto Alertify\\Alertify\\Alertify\\Views\\Emergencies\\Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Views\\Emergencies\\Create.cshtml",
               "RelativeDocumentMoniker": "Alertify\\Views\\Emergencies\\Create.cshtml",
-              "ToolTip": "C:\\Users\\johnn\\OneDrive\\Desktop\\Proyecto Alertify\\Alertify\\Alertify\\Views\\Emergencies\\Create.cshtml",
+              "ToolTip": "C:\\Users\\ASUS\\Documents\\GitHub\\Alertify\\Alertify\\Alertify\\Views\\Emergencies\\Create.cshtml",
               "RelativeToolTip": "Alertify\\Views\\Emergencies\\Create.cshtml",
-              "ViewState": "AgIAAI4AAAAAAAAAAAAmwKQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAAAKUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-12-01T14:01:57.604Z",
               "EditorCaption": ""
