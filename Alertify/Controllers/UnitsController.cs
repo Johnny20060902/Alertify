@@ -19,14 +19,12 @@ namespace Alertify.Controllers
             _context = context;
         }
 
-        // GET: Units
         public async Task<IActionResult> Index()
         {
             var alertifyDbContext = _context.Units.Include(u => u.Station);
             return View(await alertifyDbContext.ToListAsync());
         }
 
-        // GET: Units/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,23 +43,18 @@ namespace Alertify.Controllers
             return View(unit);
         }
 
-        // GET: Units/Create
         public IActionResult Create()
         {
             ViewData["StationID"] = new SelectList(_context.Stations, "StationID", "Name");
             return View();
         }
 
-        // POST: Units/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Code,Name,ServiceType,UnitStatus,ResponsiblePerson,ContactEmail,ContactPhone,StationID,Status")] Unit unit)
         {
             if (ModelState.IsValid)
             {
-                // Asignar automáticamente campos de auditoría
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 int parsedUserId = userId != null && int.TryParse(userId, out int uid) ? uid : 1;
 
@@ -79,7 +72,6 @@ namespace Alertify.Controllers
             return View(unit);
         }
 
-        // GET: Units/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -96,9 +88,6 @@ namespace Alertify.Controllers
             return View(unit);
         }
 
-        // POST: Units/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UnitID,Code,Name,ServiceType,UnitStatus,ResponsiblePerson,ContactEmail,ContactPhone,StationID,Status")] Unit unit)
@@ -112,14 +101,12 @@ namespace Alertify.Controllers
             {
                 try
                 {
-                    // Obtener la unidad existente para preservar CreatedBy y CreationDate
                     var existingUnit = await _context.Units.FindAsync(id);
                     if (existingUnit == null)
                     {
                         return NotFound();
                     }
 
-                    // Validar que el código no sea duplicado (excluyendo el registro actual)
                     var duplicateCode = await _context.Units
                         .FirstOrDefaultAsync(u => u.Code == unit.Code && u.UnitID != id);
                     if (duplicateCode != null)
@@ -129,18 +116,16 @@ namespace Alertify.Controllers
                         return View(unit);
                     }
 
-                    // Actualizar solo los campos editables
                     existingUnit.Code = unit.Code;
                     existingUnit.Name = unit.Name;
                     existingUnit.ServiceType = unit.ServiceType;
-                    existingUnit.UnitStatus = unit.UnitStatus ?? "Disponible"; // Default value
+                    existingUnit.UnitStatus = unit.UnitStatus ?? "Disponible";
                     existingUnit.ResponsiblePerson = unit.ResponsiblePerson;
                     existingUnit.ContactEmail = unit.ContactEmail;
                     existingUnit.ContactPhone = unit.ContactPhone;
                     existingUnit.StationID = unit.StationID;
                     existingUnit.Status = unit.Status;
 
-                    // Asignar campos de auditoría de modificación
                     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                     int parsedUserId = userId != null && int.TryParse(userId, out int uid) ? uid : 1;
                     existingUnit.ModifiedBy = parsedUserId;
@@ -166,7 +151,6 @@ namespace Alertify.Controllers
             return View(unit);
         }
 
-        // GET: Units/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -185,7 +169,6 @@ namespace Alertify.Controllers
             return View(unit);
         }
 
-        // POST: Units/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

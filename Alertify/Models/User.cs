@@ -57,7 +57,6 @@ namespace Alertify.Models
         [Required]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
-        // Navigation properties
         public ICollection<Emergency>? Emergencies { get; set; }
         public ICollection<Notification>? Notifications { get; set; }
     }

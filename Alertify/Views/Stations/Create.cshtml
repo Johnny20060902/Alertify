@@ -123,7 +123,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // Crear icono personalizado para estaciones
         const stationIcon = L.divIcon({
             html: `<div class="create-station-icon">
                 <i class="bi bi-building-fill"></i>
@@ -134,10 +133,7 @@
             className: ''
         });
 
-        // Coordenadas de Cochabamba, Bolivia
         const cochabambaCoords = [-17.3895, -66.1568];
-        
-        // Inicializar mapa centrado en Cochabamba
         const map = L.map('map').setView(cochabambaCoords, 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -147,24 +143,20 @@
 
         let marker;
 
-        // Evento de clic en el mapa
         map.on('click', function (e) {
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
 
-            // Actualizar campos con 6 decimales
             const latStr = lat.toFixed(6).toString().replace(/,/g, '.');
             const lngStr = lng.toFixed(6).toString().replace(/,/g, '.');
             
             document.getElementById("Latitude").value = latStr;
             document.getElementById("Longitude").value = lngStr;
 
-            // Eliminar marcador anterior
             if (marker) {
                 map.removeLayer(marker);
             }
 
-            // Crear nuevo marcador con icono personalizado
             marker = L.marker([lat, lng], { icon: stationIcon })
                 .addTo(map)
                 .bindPopup(`<div class="station-create-popup">
@@ -174,25 +166,20 @@
                 </div>`)
                 .openPopup();
 
-            // Centrar mapa en el marcador
             map.setView([lat, lng], 16);
         });
 
-        // Buscar ubicación actual del usuario
         document.addEventListener('DOMContentLoaded', function () {
-            // Colocar marcador inicial en Cochabamba
             marker = L.marker(cochabambaCoords, { icon: stationIcon, title: 'Haz clic para cambiar ubicación' })
                 .addTo(map)
                 .bindPopup('<div class="station-create-popup"><strong>Haz clic en otro lugar para mover el marcador</strong></div>')
                 .openPopup();
 
-            // Intentar obtener ubicación actual
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     
-                    // Mover marcador a ubicación actual
                     if (marker) {
                         map.removeLayer(marker);
                     }
@@ -202,10 +189,8 @@
                         .bindPopup('Tu ubicación actual - Haz clic para cambiar')
                         .openPopup();
 
-                    // Centrar mapa
                     map.setView([lat, lng], 15);
                     
-                    // Actualizar campos
                     document.getElementById("Latitude").value = lat.toFixed(6);
                     document.getElementById("Longitude").value = lng.toFixed(6);
                 }, function () {
