@@ -1,0 +1,87 @@
+﻿@model Alertify.ViewModels.Profile.EditProfileViewModel
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-fill-gear me-2"></i>Editar Perfil
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Profile" asp-action="Edit" method="post" enctype="multipart/form-data">
+
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Por favor corrige los errores del formulario.
+                            </div>
+                        }
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Ingrese su nombre" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="FirstLastName" class="form-label"></label>
+                                <input asp-for="FirstLastName" class="form-control" placeholder="Ingrese su primer apellido" />
+                                <span asp-validation-for="FirstLastName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="SecondLastName" class="form-label"></label>
+                                <input asp-for="SecondLastName" class="form-control" placeholder="Ingrese su segundo apellido" />
+                                <span asp-validation-for="SecondLastName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="NationalID" class="form-label"></label>
+                                <input asp-for="NationalID" class="form-control" placeholder="Ingrese su CI" />
+                                <span asp-validation-for="NationalID" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Phone" class="form-label"></label>
+                                <input asp-for="Phone" class="form-control" placeholder="Ingrese su teléfono/celular" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Photo" class="form-label"></label>
+                                <input asp-for="Photo" type="file" class="form-control" accept="image/jpeg,image/jpg,image/png" />
+                                <span asp-validation-for="Photo" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Formatos permitidos: JPG, PNG. Tamaño máximo: 5MB
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

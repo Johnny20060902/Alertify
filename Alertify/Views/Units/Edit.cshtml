@@ -1,0 +1,143 @@
+﻿@model Alertify.Models.Unit
+
+@{
+    ViewData["Title"] = "Editar Unidad";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Editar Unidad
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Error en la validación:</strong> Por favor corrige los errores abajo.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="d-none"></div>
+                        <input type="hidden" asp-for="UnitID" />
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Code" class="form-label fw-bold">
+                                    <i class="bi bi-tag me-1"></i>Código de Unidad
+                                </label>
+                                <input asp-for="Code" class="form-control" placeholder="Ej: U001" required />
+                                <span asp-validation-for="Code" class="text-danger small d-block mt-1"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Name" class="form-label fw-bold">
+                                    <i class="bi bi-car-front-fill me-1"></i>Nombre de la Unidad
+                                </label>
+                                <input asp-for="Name" class="form-control" placeholder="Ej: Ambulancia 01" required />
+                                <span asp-validation-for="Name" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ServiceType" class="form-label fw-bold">
+                                    <i class="bi bi-shield-check me-1"></i>Tipo de Servicio
+                                </label>
+                                <select asp-for="ServiceType" class="form-select" required>
+                                    <option value="">-- Selecciona tipo --</option>
+                                    <option value="Ambulancia">🚑 Ambulancia</option>
+                                    <option value="Bomberos">🚒 Bomberos</option>
+                                    <option value="Policía">👮 Policía</option>
+                                    <option value="Rescate">🆘 Rescate</option>
+                                </select>
+                                <span asp-validation-for="ServiceType" class="text-danger small d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="UnitStatus" class="form-label fw-bold">
+                                    <i class="bi bi-traffic-light me-1"></i>Estado de la Unidad
+                                </label>
+                                <select asp-for="UnitStatus" class="form-select" required>
+                                    <option value="Disponible">✅ Disponible</option>
+                                    <option value="EnServicio">🚨 En Servicio</option>
+                                    <option value="Mantenimiento">🔧 Mantenimiento</option>
+                                </select>
+                                <span asp-validation-for="UnitStatus" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ResponsiblePerson" class="form-label fw-bold">
+                                <i class="bi bi-person me-1"></i>Persona Responsable
+                            </label>
+                            <input asp-for="ResponsiblePerson" class="form-control" placeholder="Nombre del responsable" />
+                            <span asp-validation-for="ResponsiblePerson" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactEmail" class="form-label fw-bold">
+                                    <i class="bi bi-envelope me-1"></i>Correo Electrónico
+                                </label>
+                                <input asp-for="ContactEmail" type="email" class="form-control" placeholder="correo@ejemplo.com" />
+                                <span asp-validation-for="ContactEmail" class="text-danger small d-block mt-1"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactPhone" class="form-label fw-bold">
+                                    <i class="bi bi-telephone me-1"></i>Teléfono
+                                </label>
+                                <input asp-for="ContactPhone" class="form-control" placeholder="+591 7xxxxxxxx" />
+                                <span asp-validation-for="ContactPhone" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="StationID" class="form-label fw-bold">
+                                <i class="bi bi-building me-1"></i>Estación Asignada
+                            </label>
+                            <select asp-for="StationID" class="form-select" required>
+                                <option value="">-- Selecciona una estación --</option>
+                                @if (ViewBag.StationID != null)
+                                {
+                                    @foreach (var item in ViewBag.StationID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="StationID" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex gap-2 justify-content-between">
+                            <div>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                                </button>
+                            </div>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

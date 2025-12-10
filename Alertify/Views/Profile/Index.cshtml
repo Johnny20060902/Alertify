@@ -1,0 +1,119 @@
+﻿@model Alertify.Models.User
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-circle me-2"></i>Mi Perfil
+                    </h4>
+                    <a asp-controller="Profile" asp-action="Edit" class="btn btn-light btn-sm">
+                        <i class="bi bi-pencil-fill me-1"></i>Editar
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                            <div class="mb-3">
+                                @if (!string.IsNullOrEmpty(Model.ProfilePhotoURL))
+                                {
+                                    <img src="@Model.ProfilePhotoURL" alt="Foto de perfil"
+                                         class="img-fluid rounded-circle shadow"
+                                         style="width: 200px; height: 200px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center shadow"
+                                         style="width: 200px; height: 200px; margin: 0 auto;">
+                                        <i class="bi bi-person-fill text-secondary" style="font-size: 6rem;"></i>
+                                    </div>
+                                }
+                            </div>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Para cambiar tu foto, edita tu perfil
+                            </p>
+                        </div>
+
+                        <div class="col-md-8">
+                            <h5 class="border-bottom pb-2 mb-3">Información Personal</h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="text-muted small mb-1">Nombre</label>
+                                    <p class="fw-semibold mb-0">@Model.FirstName</p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-muted small mb-1">Primer Apellido</label>
+                                    <p class="fw-semibold mb-0">@Model.FirstLastName</p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-muted small mb-1">Segundo Apellido</label>
+                                    <p class="fw-semibold mb-0">@(Model.SecondLastName ?? "-")</p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-muted small mb-1">Cédula de Identidad</label>
+                                    <p class="fw-semibold mb-0">@(Model.NationalID ?? "-")</p>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="text-muted small mb-1">Correo Electrónico</label>
+                                    <p class="fw-semibold mb-0">
+                                        <i class="bi bi-envelope me-2"></i>@Model.Email
+                                    </p>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="text-muted small mb-1">Teléfono</label>
+                                    <p class="fw-semibold mb-0">
+                                        <i class="bi bi-phone me-2"></i>@(Model.Phone ?? "-")
+                                    </p>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="text-muted small mb-1">Rol</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary">@Model.Role</span>
+                                    </p>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="text-muted small mb-1">Fecha de Registro</label>
+                                    <p class="fw-semibold mb-0">
+                                        <i class="bi bi-calendar-check me-2"></i>@Model.RegistrationDate.ToString("dd/MM/yyyy")
+                                    </p>
+                                </div>
+
+                                @if (Model.LastAccess.HasValue)
+                                {
+                                    <div class="col-12">
+                                        <label class="text-muted small mb-1">Último Acceso</label>
+                                        <p class="fw-semibold mb-0">
+                                            <i class="bi bi-clock me-2"></i>@Model.LastAccess.Value.ToString("dd/MM/yyyy HH:mm")
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

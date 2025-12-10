@@ -1,0 +1,221 @@
+﻿@model Alertify.Models.Station
+
+@{
+    ViewData["Title"] = "Crear Estación";
+}
+
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-building-fill me-2"></i>Crear Nueva Estación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                        <!-- NOMBRE -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold">
+                                <i class="bi bi-building me-1"></i>Nombre de la Estación
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="Ej: Estación Central de Bomberos" required/>
+                            <span asp-validation-for="Name" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <!-- TIPO DE SERVICIO -->
+                        <div class="mb-3">
+                            <label asp-for="ServiceType" class="form-label fw-bold">
+                                <i class="bi bi-shield-check me-1"></i>Tipo de Servicio
+                            </label>
+                            <select asp-for="ServiceType" class="form-select" required>
+                                <option value="">-- Seleccione tipo --</option>
+                                <option value="Bomberos">🚒 Bomberos</option>
+                                <option value="Policía">👮 Policía</option>
+                                <option value="Ambulancia">🚑 Ambulancia</option>
+                                <option value="Defensa Civil">🛡️ Defensa Civil</option>
+                                <option value="Otro">⚙️ Otro</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <!-- DIRECCIÓN -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold">
+                                <i class="bi bi-geo-alt me-1"></i>Dirección
+                            </label>
+                            <input asp-for="Address" class="form-control" placeholder="Calle, número, zona..."/>
+                            <span asp-validation-for="Address" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <!-- TELÉFONO -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold">
+                                <i class="bi bi-telephone me-1"></i>Teléfono
+                            </label>
+                            <input asp-for="Phone" class="form-control" placeholder="Ej: +591 3 1234567"/>
+                            <span asp-validation-for="Phone" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <!-- LATITUD -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Latitude" class="form-label fw-bold">
+                                    <i class="bi bi-pin-map me-1"></i>Latitud
+                                </label>
+                                <input asp-for="Latitude" id="Latitude" class="form-control" placeholder="Auto" readonly />
+                                <span asp-validation-for="Latitude" class="text-danger small d-block mt-1"></span>
+                            </div>
+
+                            <!-- LONGITUD -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Longitude" class="form-label fw-bold">
+                                    <i class="bi bi-pin-map me-1"></i>Longitud
+                                </label>
+                                <input asp-for="Longitude" id="Longitude" class="form-control" placeholder="Auto" readonly />
+                                <span asp-validation-for="Longitude" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- BOTONES -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>Crear Estación
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAPA -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-map me-2"></i>Seleccionar Ubicación
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="alert alert-info m-3 small">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Instrucciones:</strong> Haz clic en el mapa para marcar la ubicación de la estación. 
+                        El marcador <span class="badge bg-primary"><i class="bi bi-building-fill"></i></span> 
+                        se moverá a donde hagas clic.
+                    </div>
+                    <div id="map" style="height: 500px; border-radius: 0 0 8px 8px;" class="border-top"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Crear icono personalizado para estaciones
+        const stationIcon = L.divIcon({
+            html: `<div class="create-station-icon">
+                <i class="bi bi-building-fill"></i>
+            </div>`,
+            iconSize: [45, 45],
+            iconAnchor: [22, 45],
+            popupAnchor: [0, -45],
+            className: ''
+        });
+
+        // Coordenadas de Cochabamba, Bolivia
+        const cochabambaCoords = [-17.3895, -66.1568];
+        
+        // Inicializar mapa centrado en Cochabamba
+        const map = L.map('map').setView(cochabambaCoords, 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker;
+
+        // Evento de clic en el mapa
+        map.on('click', function (e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            // Actualizar campos con 6 decimales
+            const latStr = lat.toFixed(6).toString().replace(/,/g, '.');
+            const lngStr = lng.toFixed(6).toString().replace(/,/g, '.');
+            
+            document.getElementById("Latitude").value = latStr;
+            document.getElementById("Longitude").value = lngStr;
+
+            // Eliminar marcador anterior
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Crear nuevo marcador con icono personalizado
+            marker = L.marker([lat, lng], { icon: stationIcon })
+                .addTo(map)
+                .bindPopup(`<div class="station-create-popup">
+                    <strong><i class="bi bi-building-fill text-primary"></i> Nueva Estación</strong><br/>
+                    <small>Lat: ${latStr}</small><br/>
+                    <small>Lng: ${lngStr}</small>
+                </div>`)
+                .openPopup();
+
+            // Centrar mapa en el marcador
+            map.setView([lat, lng], 16);
+        });
+
+        // Buscar ubicación actual del usuario
+        document.addEventListener('DOMContentLoaded', function () {
+            // Colocar marcador inicial en Cochabamba
+            marker = L.marker(cochabambaCoords, { icon: stationIcon, title: 'Haz clic para cambiar ubicación' })
+                .addTo(map)
+                .bindPopup('<div class="station-create-popup"><strong>Haz clic en otro lugar para mover el marcador</strong></div>')
+                .openPopup();
+
+            // Intentar obtener ubicación actual
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Mover marcador a ubicación actual
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    
+                    marker = L.marker([lat, lng], { icon: stationIcon })
+                        .addTo(map)
+                        .bindPopup('Tu ubicación actual - Haz clic para cambiar')
+                        .openPopup();
+
+                    // Centrar mapa
+                    map.setView([lat, lng], 15);
+                    
+                    // Actualizar campos
+                    document.getElementById("Latitude").value = lat.toFixed(6);
+                    document.getElementById("Longitude").value = lng.toFixed(6);
+                }, function () {
+                    console.log('Geolocalización no disponible');
+                });
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,155 @@
+﻿@model IEnumerable<Alertify.Models.Station>
+
+@{
+    ViewData["Title"] = "Estaciones de Servicio";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-building text-primary me-2"></i>Estaciones de Servicio
+            </h2>
+            <p class="text-muted mb-0">Visualiza todas las estaciones y su ubicación</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Estación
+        </a>
+    </div>
+
+    <!-- Mapa de Estaciones -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-geo-alt-fill me-2"></i>Mapa de Estaciones
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div id="stationsMap" style="height: 500px; width: 100%;"></div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Estaciones -->
+    <div class="row g-3">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 station-card transition-all">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="bi bi-building text-primary me-2"></i>@item.Name
+                                </h5>
+                                <span class="badge bg-info">@item.ServiceType</span>
+                            </div>
+                            @if (item.Status == "Activo")
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Activa
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactiva</span>
+                            }
+                        </div>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>@item.Address
+                        </p>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-telephone me-2"></i>@item.Phone
+                        </p>
+                        <hr class="my-2">
+                        <p class="text-muted small mb-1">
+                            <strong>Creado por:</strong> @item.CreatedBy
+                        </p>
+                        <p class="text-muted small">
+                            <strong>Fecha:</strong> @item.CreationDate.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                    </div>
+                    <div class="card-footer bg-light border-0">
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@item.StationID" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil me-1"></i>Editar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.StationID" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-eye me-1"></i>Ver
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.StationID" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i>Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let stationsMap;
+        const stationsData = @Html.Raw(Json.Serialize(Model.Select(s => new { 
+            stationID = s.StationID,
+            name = s.Name ?? "Estación", 
+            serviceType = s.ServiceType ?? "Servicio", 
+            address = s.Address ?? "Dirección",
+            latitude = s.Latitude,
+            longitude = s.Longitude
+        }).ToList()));
+
+        // Crear icono SVG personalizado para estaciones
+        const stationIcon = L.divIcon({
+            html: `<div class="station-map-icon">
+                <i class="bi bi-building-fill"></i>
+            </div>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40],
+            className: ''
+        });
+
+        function initStationsMap() {
+            // Coordenadas de Cochabamba, Bolivia
+            const cochabambaCoords = [-17.3895, -66.1568];
+            stationsMap = L.map('stationsMap').setView(cochabambaCoords, 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(stationsMap);
+
+            // Agregar estaciones al mapa
+            let bounds = [];
+            stationsData.forEach(station => {
+                const lat = parseFloat(station.latitude);
+                const lng = parseFloat(station.longitude);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    L.marker([lat, lng], { icon: stationIcon })
+                        .bindPopup(`
+                            <div class="station-popup">
+                                <strong><i class="bi bi-building text-primary"></i> ${station.name}</strong><br>
+                                <small class="text-muted">${station.serviceType}</small><br>
+                                <small><i class="bi bi-geo-alt"></i> ${station.address}</small>
+                            </div>
+                        `)
+                        .addTo(stationsMap);
+                    
+                    bounds.push([lat, lng]);
+                }
+            });
+
+            // Ajustar vista si hay estaciones
+            if (bounds.length > 0) {
+                stationsMap.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initStationsMap);
+    </script>
+}

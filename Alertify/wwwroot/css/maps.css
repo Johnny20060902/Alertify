@@ -1,0 +1,162 @@
+/* ====== ESTILOS PARA MAPAS ====== */
+
+.leaflet-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Estilo para el mapa */
+#map,
+#stationsMap {
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Popup del mapa */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.leaflet-popup-content strong {
+  color: #333;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.leaflet-popup-content small {
+  color: #666;
+  display: block;
+  margin: 3px 0;
+}
+
+.leaflet-popup-content .badge {
+  font-size: 11px;
+  padding: 3px 6px;
+}
+
+/* Tip del popup */
+.leaflet-popup-tip {
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Control de zoom */
+.leaflet-control-zoom {
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-control-zoom a {
+  border-radius: 4px;
+  color: #333;
+  background-color: #fff;
+  border: none;
+  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f0f0f0;
+  color: #0d6efd;
+}
+
+/* Attributions */
+.leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+}
+
+/* Leyenda del mapa */
+.map-legend {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+}
+
+.map-legend p {
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-legend i {
+  font-size: 12px;
+}
+
+/* Animación de marcadores de emergencia */
+@keyframes emergencyPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+/* Estilo para marcadores personalizados */
+.emergency-marker {
+  animation: emergencyPulse 2s infinite;
+}
+
+/* Icono de emergencia en el mapa */
+.emergency-map-marker {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border: 3px solid white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+  animation: emergencyMarkerPulse 1.5s infinite;
+}
+
+.emergency-map-marker:hover {
+  animation: none;
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.8);
+}
+
+@keyframes emergencyMarkerPulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(220, 53, 69, 0.8);
+  }
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+  #map,
+  #stationsMap {
+    height: 350px !important;
+  }
+
+  .map-legend {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .leaflet-popup-content {
+    font-size: 12px;
+  }
+}

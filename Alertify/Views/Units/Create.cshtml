@@ -1,0 +1,92 @@
+﻿@model Alertify.Models.Unit
+
+@{
+    ViewData["Title"] = "Crear Unidad";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="card-title mb-4"><i class="bi bi-plus-circle"></i> Crear Nueva Unidad</h2>
+                    <hr />
+                    
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Code" class="form-label fw-bold">Código de Unidad</label>
+                            <input asp-for="Code" class="form-control" placeholder="Ej: U001" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold">Nombre de la Unidad</label>
+                            <input asp-for="Name" class="form-control" placeholder="Ej: Ambulancia 01" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ServiceType" class="form-label fw-bold">Tipo de Servicio</label>
+                            <select asp-for="ServiceType" class="form-control">
+                                <option value="">Seleccionar tipo de servicio</option>
+                                <option value="Ambulancia">Ambulancia</option>
+                                <option value="Bomberos">Bomberos</option>
+                                <option value="Policía">Policía</option>
+                                <option value="Rescate">Rescate</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ResponsiblePerson" class="form-label fw-bold">Persona Responsable</label>
+                            <input asp-for="ResponsiblePerson" class="form-control" placeholder="Nombre del responsable" />
+                            <span asp-validation-for="ResponsiblePerson" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ContactEmail" class="form-label fw-bold">Correo Electrónico</label>
+                            <input asp-for="ContactEmail" type="email" class="form-control" placeholder="correo@ejemplo.com" />
+                            <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ContactPhone" class="form-label fw-bold">Teléfono</label>
+                            <input asp-for="ContactPhone" class="form-control" placeholder="+591 7xxxxxxxx" />
+                            <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="StationID" class="form-label fw-bold">Estación Asignada *</label>
+                            <select asp-for="StationID" class="form-control" required>
+                                <option value="">Seleccionar estación</option>
+                                @if (ViewBag.StationID != null)
+                                {
+                                    @foreach (var item in ViewBag.StationID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="StationID" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Crear Unidad
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

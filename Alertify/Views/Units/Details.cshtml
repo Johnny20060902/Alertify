@@ -1,0 +1,195 @@
+﻿@model Alertify.Models.Unit
+
+@{
+    ViewData["Title"] = $"Detalles de {Model?.Name}";
+
+    var statusColor = Model?.UnitStatus == "Disponible" ? "success" : 
+                    Model?.UnitStatus == "EnServicio" ? "warning" : "danger";
+    var statusIcon = Model?.UnitStatus == "Disponible" ? "check-circle" : 
+                   Model?.UnitStatus == "EnServicio" ? "exclamation-triangle" : "tools";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-car-front-fill me-2"></i>@Model?.Name
+                        </h4>
+                        <span class="badge bg-@statusColor fs-6">
+                            <i class="bi bi-@statusIcon me-1"></i>@Model?.UnitStatus
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Información General -->
+                    <h5 class="mb-3">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>Información General
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-tag me-1"></i>Código
+                                </label>
+                                <p class="mb-0 fs-5">@Model?.Code</p>
+                            </div>
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-shield-check me-1"></i>Tipo de Servicio
+                                </label>
+                                <p class="mb-0 fs-5">@Model?.ServiceType</p>
+                            </div>
+                            <div class="info-box">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-building me-1"></i>Estación
+                                </label>
+                                <p class="mb-0 fs-5">@Model?.Station?.Name</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-person me-1"></i>Responsable
+                                </label>
+                                <p class="mb-0 fs-5">@Model?.ResponsiblePerson</p>
+                            </div>
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-envelope me-1"></i>Correo
+                                </label>
+                                <p class="mb-0 fs-5">
+                                    @if (!string.IsNullOrEmpty(Model?.ContactEmail))
+                                    {
+                                        <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No especificado</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="info-box">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-telephone me-1"></i>Teléfono
+                                </label>
+                                <p class="mb-0 fs-5">
+                                    @if (!string.IsNullOrEmpty(Model?.ContactPhone))
+                                    {
+                                        <a href="tel:@Model.ContactPhone">@Model.ContactPhone</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No especificado</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Información de Auditoría -->
+                    <h5 class="mb-3">
+                        <i class="bi bi-clock-history me-2 text-secondary"></i>Información de Auditoría
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-calendar-event me-1"></i>Fecha de Creación
+                                </label>
+                                <p class="mb-0 fs-6">@Model?.CreationDate.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                            </div>
+                            <div class="info-box">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-person-badge me-1"></i>Creado Por
+                                </label>
+                                <p class="mb-0 fs-6">ID: @Model?.CreatedBy</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box mb-3">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-calendar2-check me-1"></i>Última Modificación
+                                </label>
+                                <p class="mb-0 fs-6">
+                                    @if (Model?.ModificationDate != null)
+                                    {
+                                        @Model.ModificationDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No modificado</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="info-box">
+                                <label class="fw-bold text-muted small">
+                                    <i class="bi bi-person-badge me-1"></i>Modificado Por
+                                </label>
+                                <p class="mb-0 fs-6">
+                                    @if (Model?.ModifiedBy != null)
+                                    {
+                                        @:ID: @Model.ModifiedBy
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin cambios</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Botones de Acción -->
+                    <div class="d-flex gap-2 justify-content-between">
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model?.UnitID" class="btn btn-primary btn-lg">
+                                <i class="bi bi-pencil-square me-2"></i>Editar
+                            </a>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-box {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border-left: 3px solid #0d6efd;
+    }
+
+    .info-box label {
+        display: block;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+
+    .info-box p {
+        color: #333;
+    }
+
+    .info-box a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .info-box a:hover {
+        text-decoration: underline;
+    }
+</style>
