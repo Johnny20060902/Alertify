@@ -1,0 +1,153 @@
+﻿@model Alertify.ViewModels.AdminAssignUnitVM
+
+@{
+    ViewData["Title"] = "Asignar Unidad";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">
+        <i class="bi bi-truck text-primary"></i> Asignar Unidad a la Emergencia
+    </h2>
+
+    <div class="alert alert-info">
+        <strong>Emergencia:</strong> @Model.Emergency.EmergencyCategory <br />
+        <strong>Descripción:</strong> @Model.Emergency.Description <br />
+        <strong>Ubicación:</strong> @Model.Emergency.Address
+    </div>
+
+    <div class="card p-3 shadow-sm mb-4">
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Seleccionar Estación</label>
+                <select id="stationSelect" class="form-select">
+                    @foreach (var s in Model.Stations)
+                    {
+                        <option value="@s.StationID">@s.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Seleccionar Unidad</label>
+                <select id="unitSelect" class="form-select">
+                    <option value="">Seleccione una estación primero</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- MAPA -->
+        <div class="col-lg-6">
+            <h5 class="mb-2">
+                <i class="bi bi-geo-alt-fill text-danger"></i> Estaciones Disponibles
+            </h5>
+
+            <div id="map" style="height: 450px;" class="border rounded shadow-sm"></div>
+        </div>
+
+        <!-- TABLA DE UNIDADES -->
+        <div class="col-lg-6">
+            <h5 class="mb-2">
+                <i class="bi bi-list-task text-primary"></i> Unidades Disponibles
+            </h5>
+
+            <table class="table table-hover shadow-sm rounded">
+                <thead class="table-light">
+                    <tr>
+                        <th>Unidad</th>
+                        <th>Estación</th>
+                        <th>Distancia</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="unitsTable">
+                    <tr>
+                        <td colspan="4" class="text-muted text-center">Seleccione una estación…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+
+        // ========= DATOS =========
+        var stations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Stations));
+        var units = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Units));
+
+        var emergencyLat = @Model.Emergency.Latitude;
+        var emergencyLng = @Model.Emergency.Longitude;
+
+        // ========= MAPA =========
+        var map = L.map('map').setView([emergencyLat, emergencyLng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+
+        L.marker([emergencyLat, emergencyLng]).addTo(map)
+            .bindPopup("<b>Ubicación de la Emergencia</b>");
+
+        stations.forEach(s => {
+            L.marker([s.Latitude, s.Longitude])
+                .addTo(map)
+                .bindPopup("<b>" + s.Name + "</b>");
+        });
+
+        // ========= CARGA DE UNIDADES =========
+        const stationSelect = document.getElementById("stationSelect");
+        const unitSelect = document.getElementById("unitSelect");
+        const table = document.getElementById("unitsTable");
+
+        function loadUnits(stationId) {
+
+            let filtered = units.filter(u => u.StationID == stationId);
+
+            unitSelect.innerHTML = "";
+            table.innerHTML = "";
+
+            if (filtered.length === 0) {
+                unitSelect.innerHTML = "<option>No hay unidades disponibles</option>";
+                table.innerHTML = "<tr><td colspan='4' class='text-muted text-center'>No hay unidades disponibles</td></tr>";
+                return;
+            }
+
+            filtered.forEach(u => {
+
+                unitSelect.innerHTML += `<option value="${u.UnitID}">${u.UnitName}</option>`;
+
+                table.innerHTML += `
+                    <tr>
+                        <td>${u.UnitName}</td>
+                        <td>${u.StationName}</td>
+                        <td>${u.Distance.toFixed(3)} km</td>
+                        <td>
+                            <form method='post' action='/Admin/AssignUnit'>
+                                <input type='hidden' name='emergencyId' value='@Model.Emergency.EmergencyID' />
+                                <input type='hidden' name='unitId' value='${u.UnitID}' />
+                                <button class='btn btn-primary btn-sm'>Asignar</button>
+                            </form>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        stationSelect.addEventListener("change", function () {
+            loadUnits(this.value);
+        });
+
+        // ========= SELECCIONA PRIMERA ESTACIÓN =========
+        if (stations.length > 0) {
+            stationSelect.value = stations[0].StationID;
+            loadUnits(stations[0].StationID);
+        }
+
+    </script>
+}

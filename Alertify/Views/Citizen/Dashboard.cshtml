@@ -1,0 +1,278 @@
+﻿@{
+    ViewData["Title"] = "Mi Dashboard";
+    var activeEmergencies = ViewBag.ActiveEmergencies as List<Alertify.Models.Emergency>;
+    var unreadNotifications = ViewBag.UnreadNotifications as List<Alertify.Models.Notification>;
+    var unreadCount = (int)ViewBag.UnreadCount;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Citizen/dashboard.css" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4 min-vh-100">
+    <header class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark">Hola, <span class="text-primary">@User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</span></h2>
+            <p class="text-muted mb-0">Bienvenido a tu centro de control de seguridad ciudadana.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a asp-controller="Citizen" asp-action="CreateEmergency" class="btn btn-danger btn-lg shadow-sm rounded-pill px-4 hover-lift">
+                <i class="bi bi-broadcast me-2"></i> Reportar Emergencia
+            </a>
+        </div>
+    </header>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+            <i class="bi bi-exclamation-octagon-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <section class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box bg-danger bg-opacity-10 rounded-circle me-3">
+                        <i class="bi bi-hospital text-danger fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">@(activeEmergencies?.Count ?? 0)</h3>
+                        <span class="text-muted small text-uppercase fw-semibold ls-1">Emergencias Activas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box bg-warning bg-opacity-10 rounded-circle me-3">
+                        <i class="bi bi-bell-fill text-warning fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">@unreadCount</h3>
+                        <span class="text-muted small text-uppercase fw-semibold ls-1">Notificaciones Nuevas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <a asp-controller="Citizen" asp-action="MyEmergencies" class="text-decoration-none">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift bg-primary text-white">
+                    <div class="card-body d-flex align-items-center justify-content-between">
+                        <div>
+                            <h5 class="fw-bold mb-1">Historial</h5>
+                            <span class="small text-white-50">Ver todos mis reportes</span>
+                        </div>
+                        <i class="bi bi-arrow-right-circle fs-2 text-white-50"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <section class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-3 rounded-top-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-heart-pulse text-danger me-2"></i> Emergencias en Curso
+                    </h5>
+                    @if (activeEmergencies?.Any() == true)
+                    {
+                        <span class="badge bg-danger bg-opacity-10 text-danger animate__animated animate__pulse animate__infinite">En curso</span>
+                    }
+                </div>
+
+                <div class="card-body p-0">
+                    @if (activeEmergencies?.Any() == true)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var emergency in activeEmergencies)
+                            {
+                                var statusClass = emergency.EmergencyStatus switch
+                                {
+                                    "Pendiente" => "warning",
+                                    "Asignada" => "info",
+                                    "EnCamino" => "primary",
+                                    "EnSitio" => "success",
+                                    _ => "secondary"
+                                };
+
+                                var borderClass = "status-" + statusClass.ToLower();
+
+                                var categoryIcon = emergency.EmergencyCategory switch
+                                {
+                                    "Policia" => "shield-shaded",
+                                    "Bomberos" => "fire",
+                                    "Medico" => "bandaid-fill",
+                                    _ => "exclamation-circle"
+                                };
+
+                                <div class="list-group-item p-4 emergency-card @borderClass">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                        <div class="d-flex gap-3">
+                                            <div class="bg-light rounded p-2 align-self-start">
+                                                <i class="bi bi-@categoryIcon text-secondary fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-1">
+                                                    <h6 class="fw-bold mb-0">@emergency.EmergencyCategory</h6>
+                                                    <span class="badge rounded-pill bg-@statusClass bg-opacity-10 text-@statusClass border border-@statusClass">
+                                                        @emergency.EmergencyStatus
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted small mb-2">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                                    @(emergency.Address ?? "Ubicación no especificada")
+                                                </p>
+                                                <small class="text-muted d-block">
+                                                    Creado el: @emergency.CreationDate.ToString("dd/MM/yyyy") a las <strong>@emergency.CreationDate.ToString("HH:mm")</strong>
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-column gap-2 col-12 col-sm-auto">
+                                            <a asp-controller="Citizen" asp-action="EmergencyDetail" asp-route-id="@emergency.EmergencyID"
+                                               class="btn btn-outline-primary btn-sm rounded-pill">
+                                                Ver Detalles
+                                            </a>
+
+                                            @if (emergency.EmergencyStatus == "Pendiente" || emergency.EmergencyStatus == "Asignada")
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm rounded-pill border-0"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#cancelEmergencyModal"
+                                                        data-emergency-id="@emergency.EmergencyID">
+                                                    Cancelar
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-shield-check text-success display-1 opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold text-muted">Todo tranquilo</h5>
+                            <p class="text-muted small">No tienes emergencias activas en este momento.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <aside class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-3 rounded-top-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-inbox text-secondary me-2"></i> Notificaciones
+                    </h5>
+                    @if (unreadCount > 0)
+                    {
+                        <span class="badge bg-warning text-dark rounded-pill">@unreadCount nuevas</span>
+                    }
+                </div>
+
+                @if (unreadNotifications?.Any() == true)
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var notification in unreadNotifications)
+                        {
+                            <div class="list-group-item border-0 border-bottom py-3 px-4 position-relative">
+                                <div class="d-flex gap-3">
+                                    <div class="mt-1">
+                                        <i class="bi bi-dot text-primary fs-3 position-absolute top-0 start-0 ms-2 mt-2"></i>
+                                    </div>
+                                    <div class="ps-2">
+                                        <h6 class="fw-bold mb-1 text-dark small">@notification.Subject</h6>
+                                        <p class="text-muted small mb-1 lh-sm">@notification.Message</p>
+                                        <small class="text-secondary opacity-75" style="font-size: 0.75rem;">
+                                            @notification.SendDate.ToString("dd MMM, HH:mm")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer bg-white text-center py-3 border-0 rounded-bottom-4">
+                        <a asp-controller="Citizen" asp-action="Notifications" class="btn btn-link btn-sm text-decoration-none text-muted fw-bold">
+                            Ver todas las notificaciones
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body text-center py-5 d-flex flex-column align-items-center justify-content-center">
+                        <div class="bg-light rounded-circle p-3 mb-3">
+                            <i class="bi bi-bell-slash text-muted fs-4"></i>
+                        </div>
+                        <p class="text-muted small mb-0">No hay notificaciones nuevas</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+
+    <div class="modal fade" id="cancelEmergencyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <form asp-controller="Citizen" asp-action="CancelEmergency" method="post">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold">Cancelar Emergencia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-2">
+                        <input type="hidden" name="id" id="emergencyIdInput" />
+
+                        <div class="alert alert-warning d-flex align-items-center border-0 bg-warning bg-opacity-10 text-dark rounded-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-3 fs-4"></i>
+                            <div>
+                                <strong>Advertencia:</strong> Esta acción detendrá el seguimiento y asistencia.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mt-3">
+                            <textarea class="form-control" id="cancellationReason" name="cancellationReason"
+                                      placeholder="Motivo" style="height: 100px" maxlength="500"></textarea>
+                            <label for="cancellationReason">Motivo de cancelación (Opcional)</label>
+                        </div>
+                        <div class="text-end text-muted small mt-1">Máx. 500 caracteres</div>
+                    </div>
+                    <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Regresar</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4">
+                            Sí, Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cancelModal = document.getElementById('cancelEmergencyModal');
+        if (cancelModal) {
+            cancelModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const emergencyId = button.getAttribute('data-emergency-id');
+                const input = cancelModal.querySelector('#emergencyIdInput');
+                input.value = emergencyId;
+            });
+
+            cancelModal.addEventListener('hidden.bs.modal', function () {
+                const textArea = cancelModal.querySelector('#cancellationReason');
+                if(textArea) textArea.value = '';
+            });
+        }
+    });
+</script>

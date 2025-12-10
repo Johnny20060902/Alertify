@@ -1,0 +1,170 @@
+﻿@model Alertify.Models.User
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Profile/Index.css" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <header class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">Mi Perfil</h2>
+            <p class="text-muted mb-0">Gestiona tu información personal y de cuenta</p>
+        </div>
+        <a asp-controller="Profile" asp-action="Edit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+            <i class="bi bi-pencil-square me-2"></i>Editar Datos
+        </a>
+    </header>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="profile-section p-4 text-center position-relative">
+                <div class="bg-light position-absolute top-0 start-0 w-100" style="height: 100px;"></div>
+
+                <div class="position-relative mb-3">
+                    <div class="avatar-container">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePhotoURL))
+                        {
+                            <img src="@Model.ProfilePhotoURL" alt="@Model.FirstName" class="avatar-img">
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder">
+                                <i class="bi bi-person-fill display-1"></i>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <h4 class="fw-bold mb-1">@Model.FirstName @Model.FirstLastName</h4>
+                <p class="text-muted mb-3">@Model.Email</p>
+
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-4">
+                    @Model.Role
+                </span>
+
+                <div class="border-top pt-4 mt-2">
+                    <div class="row text-center">
+                        <div class="col-6 border-end">
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Miembro desde</small>
+                            <span class="fw-semibold">@Model.RegistrationDate.ToString("MMM yyyy")</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Último Acceso</small>
+                            <span class="fw-semibold">
+                                @(Model.LastAccess.HasValue? Model.LastAccess.Value.ToString("dd MMM") : "-")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="profile-section p-4 h-100 d-flex flex-column">
+                <h5 class="fw-bold mb-4 ps-2 border-start border-4 border-primary">Información Personal</h5>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary me-3">
+                                    <i class="bi bi-person-vcard"></i>
+                                </div>
+                                <div>
+                                    <div class="label-text">Nombre Completo</div>
+                                    <div class="value-text">@Model.FirstName @Model.FirstLastName @(Model.SecondLastName ?? "")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box bg-success bg-opacity-10 text-success me-3">
+                                    <i class="bi bi-card-heading"></i>
+                                </div>
+                                <div>
+                                    <div class="label-text">Cédula de Identidad</div>
+                                    <div class="value-text">@(Model.NationalID ?? "No registrada")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <hr class="text-muted opacity-25 my-1">
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box bg-warning bg-opacity-10 text-warning me-3">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+                                <div>
+                                    <div class="label-text">Correo Electrónico</div>
+                                    <div class="value-text">@Model.Email</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box bg-info bg-opacity-10 text-info me-3">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                                <div>
+                                    <div class="label-text">Teléfono</div>
+                                    <div class="value-text">@(Model.Phone ?? "No registrado")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <h5 class="fw-bold mb-3 ps-2 border-start border-4 border-secondary">Seguridad de la Cuenta</h5>
+                    <div class="bg-light rounded-4 p-4">
+                        <div class="d-flex align-items-start gap-3 mb-4">
+                            <i class="bi bi-shield-check text-muted fs-4 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Permisos y Roles</h6>
+                                <p class="text-muted small mb-0">
+                                    Tu rol actual es <strong>@Model.Role</strong>. Si necesitas actualizar tus permisos de acceso, contacta al administrador del sistema.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 border-top pt-3">
+                            <a asp-controller="Authentication" asp-action="ChangePassword" class="btn btn-outline-secondary rounded-pill px-4 fw-bold small">
+                                <i class="bi bi-key me-2"></i>Cambiar Contraseña
+                            </a>
+
+                            <form asp-controller="Authentication" asp-action="Logout" method="post" class="m-0">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none fw-bold small p-0">
+                                    Cerrar Sesión <i class="bi bi-box-arrow-right ms-1"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

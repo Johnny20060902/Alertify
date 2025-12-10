@@ -1,0 +1,147 @@
+﻿@model List<Alertify.Models.Emergency>
+@{
+    ViewData["Title"] = "Mis Emergencias";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Citizen/MyEmergencies.css" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4">
+    <header class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">Historial</h2>
+            <p class="text-muted mb-0">Registro completo de tus reportes y seguimientos</p>
+        </div>
+        <a asp-controller="Citizen" asp-action="Dashboard" class="btn btn-light rounded-pill px-4 shadow-sm text-secondary fw-bold small">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+        </a>
+    </header>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex gap-3 overflow-auto pb-2">
+                    <div class="bg-white rounded-4 p-3 shadow-sm border-0 d-flex align-items-center gap-3 pe-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2" style="width: 40px; height: 40px; display: grid; place-items: center;">
+                            <i class="bi bi-folder-fill"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small text-muted fw-bold">TOTAL</span>
+                            <span class="h5 fw-bold mb-0">@Model.Count</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-4 p-3 shadow-sm border-0 d-flex align-items-center gap-3 pe-4">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2" style="width: 40px; height: 40px; display: grid; place-items: center;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small text-muted fw-bold">ACTIVAS</span>
+                            <span class="h5 fw-bold mb-0">@Model.Count(e => e.EmergencyStatus != "Resuelta" && e.EmergencyStatus != "Cancelada")</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-4 p-3 shadow-sm border-0 d-flex align-items-center gap-3 pe-4">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle p-2" style="width: 40px; height: 40px; display: grid; place-items: center;">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small text-muted fw-bold">RESUELTAS</span>
+                            <span class="h5 fw-bold mb-0">@Model.Count(e => e.EmergencyStatus == "Resuelta")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <div class="table-responsive">
+                <table class="table custom-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Categoría</th>
+                            <th>Descripción y Lugar</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var emergency in Model)
+                        {
+                            var statusInfo = emergency.EmergencyStatus switch
+                            {
+                                "Pendiente" => ("warning", "text-dark"),
+                                "Asignada" => ("info", "text-dark"),
+                                "EnCamino" => ("primary", "text-white"),
+                                "EnSitio" => ("success", "text-white"),
+                                "Resuelta" => ("secondary", "text-white"),
+                                "Cancelada" => ("dark", "text-white"),
+                                _ => ("secondary", "text-white")
+                            };
+
+                            var categoryIcon = emergency.EmergencyCategory switch
+                            {
+                                "Policia" => "shield-shaded",
+                                "Bomberos" => "fire",
+                                "Medico" => "bandaid-fill",
+                                _ => "exclamation-circle"
+                            };
+
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="icon-circle text-secondary">
+                                            <i class="bi bi-@categoryIcon"></i>
+                                        </div>
+                                        <span class="fw-bold text-dark">@emergency.EmergencyCategory</span>
+                                    </div>
+                                </td>
+                                <td style="max-width: 300px;">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-truncate fw-semibold text-dark">@emergency.Description</span>
+                                        <small class="text-muted text-truncate">
+                                            <i class="bi bi-geo-alt me-1"></i>@(emergency.Address ?? "Sin dirección")
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge bg-@statusInfo.Item1 bg-opacity-25 text-@statusInfo.Item1 border border-@statusInfo.Item1 border-opacity-25">
+                                        @emergency.EmergencyStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-semibold">@emergency.CreationDate.ToString("dd MMM yyyy")</span>
+                                        <small class="text-muted">@emergency.CreationDate.ToString("HH:mm")</small>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a asp-controller="Citizen" asp-action="EmergencyDetail" asp-route-id="@emergency.EmergencyID"
+                                       class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                        Ver Detalles
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="history-container py-5 text-center">
+            <div class="mb-3">
+                <div class="bg-light rounded-circle d-inline-flex p-4">
+                    <i class="bi bi-inbox text-muted display-4"></i>
+                </div>
+            </div>
+            <h5 class="fw-bold text-dark">No hay historial disponible</h5>
+            <p class="text-muted mb-4">Aún no has realizado ningún reporte de emergencia.</p>
+            <a asp-controller="Citizen" asp-action="CreateEmergency" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                <i class="bi bi-broadcast me-2"></i>Reportar Emergencia
+            </a>
+        </div>
+    }
+</div>

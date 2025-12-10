@@ -1,0 +1,193 @@
+﻿@model Alertify.ViewModels.Citizen.CreateEmergencyViewModel
+@{
+    ViewData["Title"] = "Reportar Emergencia";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="~/css/Citizen/CreateEmergency.css" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4">
+
+    <header class="mb-4">
+        <h2 class="fw-bold text-dark">Nueva Emergencia</h2>
+        <p class="text-muted">Completa los detalles a continuación. Tu seguridad es nuestra prioridad.</p>
+    </header>
+
+    <form asp-controller="Citizen" asp-action="CreateEmergency" method="post" enctype="multipart/form-data" id="emergencyForm">
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Please check the form for errors.
+            </div>
+        }
+
+        <div class="row g-4">
+
+            <div class="col-lg-5">
+                <div class="form-container p-4 h-100">
+                    <h6 class="section-title"><i class="bi bi-list-check me-2"></i>Detalles</h6>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <select asp-for="EmergencyCategory" class="form-select border-0 bg-light" required>
+                                <option value="" selected disabled>Seleccionar...</option>
+                                <option value="Policia">Policía</option>
+                                <option value="Bomberos">Bomberos</option>
+                                <option value="Medico">Médico</option>
+                            </select>
+                            <label asp-for="EmergencyCategory">Tipo de Emergencia</label>
+                        </div>
+                        <span asp-validation-for="EmergencyCategory" class="text-danger small ms-1"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <select asp-for="Priority" class="form-select border-0 bg-light" required>
+                                <option value="" selected disabled>Seleccionar...</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Critica">Crítica</option>
+                            </select>
+                            <label asp-for="Priority">Nivel de Prioridad</label>
+                        </div>
+                        <span asp-validation-for="Priority" class="text-danger small ms-1"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <textarea asp-for="Description" class="form-control border-0 bg-light" style="height: 120px"
+                                      placeholder="Descripción" required></textarea>
+                            <label asp-for="Description">¿Qué está sucediendo?</label>
+                        </div>
+                        <div class="form-text ms-1">Se lo más descriptivo posible.</div>
+                        <span asp-validation-for="Description" class="text-danger small ms-1"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="form-container p-4 h-100">
+                    <h6 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Ubicación</h6>
+
+                    <div class="alert alert-light border-0 d-flex align-items-center p-2 mb-3">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        <small class="text-muted">Arrastra el marcador rojo para afinar la ubicación.</small>
+                    </div>
+
+                    <div class="map-wrapper shadow-sm mb-3">
+                        <div id="map" style="height: 350px; width: 100%;"></div>
+                    </div>
+
+                    <input asp-for="Latitude" type="hidden" id="latitude" />
+                    <input asp-for="Longitude" type="hidden" id="longitude" />
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Address" class="form-control border-0 bg-light" placeholder="Dirección" />
+                                <label asp-for="Address">Dirección Aproximada</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="LocationReference" class="form-control border-0 bg-light" placeholder="Referencia" />
+                                <label asp-for="LocationReference">Referencia (Ej. Frente al parque)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span asp-validation-for="Latitude" class="text-danger small d-block mt-2"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center gap-3 mt-4 mb-5">
+            <a asp-controller="Citizen" asp-action="Dashboard" class="text-decoration-none text-secondary fw-bold px-3">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-danger btn-lg rounded-pill px-5 shadow-sm hover-lift">
+                <i class="bi bi-broadcast me-2"></i> Enviar Reporte
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let marker;
+        const defaultLat = -17.3935;
+        const defaultLng = -66.1570;
+
+        function initMap(lat, lng) {
+            if (map) {
+                map.remove();
+            }
+
+            map = L.map('map').setView([lat, lng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            const emergencyIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            marker = L.marker([lat, lng], {
+                draggable: true,
+                icon: emergencyIcon
+            }).addTo(map);
+
+            marker.bindPopup('<b>Ubicación del incidente</b>').openPopup();
+
+            marker.on('dragend', function (e) {
+                const position = marker.getLatLng();
+                updateCoordinates(position.lat, position.lng);
+            });
+
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng.lat, e.latlng.lng);
+            });
+
+            updateCoordinates(lat, lng);
+        }
+
+        function updateCoordinates(lat, lng) {
+            document.getElementById('latitude').value = lat.toFixed(8);
+            document.getElementById('longitude').value = lng.toFixed(8);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        initMap(position.coords.latitude, position.coords.longitude);
+                    },
+                    function (error) {
+                        console.warn('Geolocalización falló o denegada:', error);
+                        initMap(defaultLat, defaultLng);
+                    }
+                );
+            } else {
+                initMap(defaultLat, defaultLng);
+            }
+        });
+    </script>
+}

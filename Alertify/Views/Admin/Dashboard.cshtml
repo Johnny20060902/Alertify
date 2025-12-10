@@ -1,0 +1,194 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Administrativo";
+
+    var emergencies = ViewBag.ActiveEmergencies as List<Alertify.Models.Emergency>;
+    int pendingCount = ViewBag.PendingCount as int? ?? 0;
+    int unitsAvailable = ViewBag.UnitsAvailable as int? ?? 0;
+    int stationsCount = ViewBag.StationsAvailable as int? ?? 0;
+}
+
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Panel Administrativo</h2>
+            <p class="text-muted mb-0">Monitorea emergencias y coordina recursos</p>
+        </div>
+    </header>
+
+    <!-- TARJETAS -->
+    <section class="row g-3 mb-4">
+
+        <article class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-danger bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-exclamation-circle-fill text-danger fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@emergencies?.Count</h3>
+                    <small class="text-muted">Emergencias Activas</small>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-warning bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@pendingCount</h3>
+                    <small class="text-muted">Pendientes</small>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-success bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-truck text-success fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@unitsAvailable</h3>
+                    <small class="text-muted">Unidades Disponibles</small>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                <span class="bg-primary bg-opacity-10 p-3 rounded">
+                    <i class="bi bi-building text-primary fs-3"></i>
+                </span>
+                <div>
+                    <h3 class="mb-0">@stationsCount</h3>
+                    <small class="text-muted">Estaciones Activas</small>
+                </div>
+            </div>
+        </article>
+
+    </section>
+
+    <!-- MAPA + LISTADO -->
+    <div class="row g-4">
+
+        <section class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+
+                <header class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-map-fill text-danger me-2"></i> Mapa de Emergencias
+                    </h5>
+                </header>
+
+                <div id="map" style="height: 450px;" class="rounded-bottom"></div>
+
+            </div>
+        </section>
+
+        <!-- LISTADO -->
+        <section class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+
+                <header class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-data text-primary me-2"></i> Emergencias Activas</h5>
+                </header>
+
+                @if (emergencies?.Any() == true)
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var em in emergencies)
+                        {
+                            var priorityColor = em.Priority switch
+                            {
+                                "Crítica" => "danger",
+                                "Alta" => "warning",
+                                "Media" => "info",
+                                _ => "secondary"
+                            };
+
+                            var statusColor = em.EmergencyStatus switch
+                            {
+                                "Pendiente" => "warning",
+                                "Asignada" => "info",
+                                "En progreso" => "primary",
+                                "Resuelta" => "success",
+                                _ => "secondary"
+                            };
+
+                            <li class="list-group-item d-flex justify-content-between align-items-start py-3">
+                                <div>
+                                    <strong>@em.EmergencyCategory</strong>
+                                    <span class="badge bg-@priorityColor ms-2">@em.Priority</span>
+                                    <div class="small text-muted">
+                                        <i class="bi bi-geo-alt"></i> @em.Address
+                                    </div>
+                                    <div class="small">
+                                        <span class="badge bg-@statusColor">@em.EmergencyStatus</span>
+                                    </div>
+                                </div>
+
+                                <a asp-action="Details" asp-route-id="@em.EmergencyID"
+                                   class="btn btn-outline-primary btn-sm">Ver</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                        <p class="text-muted small mb-0">Sin emergencias activas</p>
+                    </div>
+                }
+
+            </div>
+        </section>
+    </div>
+
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([-17.7833, -63.1821], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
+
+        var bounds = [];
+
+        @foreach (var e in emergencies!)
+        {
+                var color = e.Priority switch
+                {
+                        "Crítica" => "red",
+                        "Alta" => "orange",
+                        "Media" => "blue",
+                        _ => "gray"
+                };
+
+            <text>
+                var marker = L.circleMarker([@e.Latitude, @e.Longitude], {
+                    radius: 8,
+                    color: "@color",
+                    fillColor: "@color",
+                    fillOpacity: 0.6
+                })
+                .addTo(map)
+                .bindPopup("<strong>@e.EmergencyCategory</strong><br>@e.Address");
+
+                bounds.push([@e.Latitude, @e.Longitude]);
+            </text>
+        }
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds);
+        }
+    </script>
+}

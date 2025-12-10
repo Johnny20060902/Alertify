@@ -1,0 +1,87 @@
+﻿@model Alertify.Models.Emergency
+@{
+    ViewData["Title"] = "Detalle de Emergencia";
+}
+
+<div class="container py-4">
+
+    <h2 class="mb-3">
+        <i class="bi bi-eye-fill text-primary"></i> Detalles de la Emergencia
+    </h2>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-3">
+                <h5 class="fw-bold mb-3">Información General</h5>
+
+                <p><b>Categoría:</b> @Model.EmergencyCategory</p>
+                <p><b>Descripción:</b> @Model.Description</p>
+                <p><b>Dirección:</b> @Model.Address</p>
+                <p><b>Referencia:</b> @Model.LocationReference</p>
+                <p><b>Estado:</b> <span class="badge bg-info">@Model.EmergencyStatus</span></p>
+                <p><b>Prioridad:</b> @Model.Priority</p>
+
+                <hr>
+
+                <h6>Ciudadano</h6>
+                <p>@Model.Citizen?.FirstName @Model.Citizen?.FirstLastName</p>
+                <p>@Model.Citizen?.Email</p>
+                <p>@Model.Citizen?.Phone</p>
+            </div>
+        </div>
+
+        <!-- MAPA -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-3">
+                <h5 class="fw-bold">Ubicación</h5>
+                <div id="map" style="height: 350px;" class="rounded border mt-2"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="card shadow-sm p-3 mt-4">
+        <h5 class="fw-bold mb-3">Historial de Estados</h5>
+
+        @if (Model.StatusHistory?.Any() == true)
+        {
+            <ul class="list-group">
+                @foreach (var h in Model.StatusHistory.OrderByDescending(x => x.ChangeDate))
+                {
+                    <li class="list-group-item">
+                        <b>@h.PreviousStatus → @h.NewStatus</b>
+                        <small class="text-muted">(@h.ChangeDate.ToString("dd/MM HH:mm"))</small>
+                        <br />
+                        <small>@h.Comment</small>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">Sin historial registrado.</p>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var lat = @Model.Latitude;
+        var lng = @Model.Longitude;
+
+        var map = L.map('map').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("Ubicación de la emergencia");
+    </script>
+}
